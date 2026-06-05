@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* ===========================================================
+ * Design tokens — CX engagement
+ * Custom theme additions for Tailwind v4. These extend the
+ * default theme rather than replacing it, so default colors
+ * like text-white, bg-black, etc. still work.
+ * =========================================================== */
+@theme {
+  /* Page chrome */
+  --color-cream: #FBF6EF;
+  --color-ink: #1a1a2e;
+  --color-ink-soft: #444;
+  --color-ink-mute: #666;
+  --color-ink-faint: #888;
+  --color-ink-ghost: #aaa;
+  --color-hairline: rgba(0, 0, 0, 0.08);
+
+  /* Participant palette — must stay in sync with lib/colors.ts COLORS array */
+  --color-magenta: #8E2D6F;
+  --color-magenta-tint: #F4E4ED;
+  --color-magenta-dark: #5e1d49;
+
+  --color-navy: #0F1B5C;
+  --color-navy-tint: #DDE0F0;
+  --color-navy-dark: #08113b;
+
+  --color-cobalt: #3D6BD3;
+  --color-cobalt-tint: #DCE4F7;
+  --color-cobalt-dark: #284791;
+
+  --color-amber-brand: #C97A0E;
+  --color-amber-brand-tint: #FDF1DE;
+  --color-amber-brand-dark: #8a5208;
+
+  --color-lavender: #7B5BA8;
+  --color-lavender-tint: #E8DBEC;
+  --color-lavender-dark: #4a3670;
+
+  /* RAG (fixed signals + retro lanes) */
+  --color-rag-green: #3B6D11;
+  --color-rag-green-tint: #EAF3DE;
+  --color-rag-amber: #C97A0E;
+  --color-rag-amber-tint: #FDF1DE;
+  --color-rag-red: #A32D2D;
+  --color-rag-red-tint: #FCEBEB;
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Layout container — used by .page-shell utility below */
+  --container-shell: 1100px;
+}
+
+/* ===========================================================
+ * Base styles
+ * =========================================================== */
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar gutter to avoid jitter when modals open. */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* The page shell — matches the reference's .page container. */
+.page-shell {
+  max-width: var(--container-shell);
+  margin: 0 auto;
+  padding: 40px 24px;
+  position: relative;
+}
+
+/* Range slider thumb (used on the health-check dials) */
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--thumb-color, var(--color-navy));
+  cursor: grab;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--thumb-color, var(--color-navy));
+  cursor: grab;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+input[type="range"]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+input[type="range"]:disabled::-moz-range-thumb     { cursor: not-allowed; }
+
+/* Modal animations (used by app/components/Modal.tsx) */
+@keyframes cx-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cx-scale-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CX Transformation · 6-month reflection</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    background: #FBF6EF;
+    color: #1a1a2e;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  input, textarea, select { font-family: inherit; }
+  textarea { resize: vertical; }
+
+  /* TOP NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251, 246, 239, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid rgba(15, 27, 92, 0.1);
+  }
+  .nav-inner {
+    max-width: 1100px; margin: 0 auto;
+    padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .nav-logo { font-weight: 500; font-size: 15px; color: #0F1B5C; white-space: nowrap; }
+  .nav-pages { display: flex; gap: 4px; overflow-x: auto; flex: 1; justify-content: center; }
+  .nav-pages button {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    color: #444; white-space: nowrap; transition: all 0.15s;
+  }
+  .nav-pages button:hover { background: rgba(15, 27, 92, 0.06); }
+  .nav-pages button.active { background: #0F1B5C; color: white; font-weight: 500; }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .user-select {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: transparent; cursor: pointer; outline: none;
+  }
+  .reset-btn { font-size: 14px; color: #aaa; padding: 4px 8px; }
+  .reset-btn:hover { color: #666; }
+
+  /* LAYOUT */
+  .page {
+    max-width: 1100px; margin: 0 auto;
+    padding: 40px 24px;
+    position: relative;
+  }
+  .shapes-bg {
+    position: absolute; inset: 0;
+    overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .shape { position: absolute; }
+  .shape.circle { border-radius: 50%; }
+  .shape.square { border-radius: 10px; }
+  .shape.triangle {
+    width: 0; height: 0;
+    border-left: 32px solid transparent;
+    border-right: 32px solid transparent;
+  }
+  .content { position: relative; z-index: 1; }
+
+  /* TYPOGRAPHY */
+  h1 { font-size: 38px; font-weight: 500; line-height: 1.1; color: #0F1B5C; }
+  h1.banner { font-size: 36px; color: white; }
+  h2 { font-size: 26px; font-weight: 500; color: #0F1B5C; }
+  h3 { font-size: 18px; font-weight: 500; color: #0F1B5C; }
+  .eyebrow {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  .subtle { color: #888; font-size: 13px; }
+
+  /* BUTTONS */
+  .pill-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .pill-btn:hover:not(:disabled) { transform: scale(1.04); }
+  .pill-btn:active:not(:disabled) { transform: scale(0.97); }
+  .pill-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pill-primary { background: #0F1B5C; color: white; }
+  .pill-secondary {
+    background: transparent;
+    border: 1.5px solid #0F1B5C;
+    color: #0F1B5C;
+  }
+
+  /* INPUTS */
+  .input, .textarea {
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 27, 92, 0.15);
+    background: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .textarea { border-radius: 16px; }
+  .input:focus, .textarea:focus { border-color: #0F1B5C; }
+  .input-small {
+    padding: 6px 12px; font-size: 12px; border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.08); background: white; outline: none;
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: 16px;
+    border: 0.5px solid rgba(0, 0, 0, 0.08);
+    padding: 20px 24px;
+  }
+
+  /* REACTION BAR */
+  .reactions { display: flex; gap: 6px; margin-top: 8px; }
+  .reaction-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 12px;
+    transition: transform 0.1s, background 0.15s;
+  }
+  .reaction-btn:hover { background: white; transform: scale(1.08); }
+  .reaction-btn.has-count { font-weight: 500; }
+  .reaction-btn .count { font-size: 11px; font-weight: 500; }
+
+  /* BADGE */
+  .participant-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 500;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .participant-badge.lg { width: 36px; height: 36px; font-size: 13px; }
+
+  /* TILES */
+  .tile {
+    border-radius: 16px;
+    padding: 20px;
+    text-align: left;
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+  .tile:hover { transform: translateY(-4px); }
+  .stat-tile { padding: 20px; text-align: left; }
+  .stat-tile:hover { transform: translateY(-6px) scale(1.02); }
+  .stat-num {
+    font-size: 48px; font-weight: 500; line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(15, 27, 92, 0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; padding: 24px;
+    animation: fadeIn 0.2s;
+  }
+  .modal {
+    background: white;
+    border-radius: 24px;
+    max-width: 640px; width: 100%;
+    max-height: 85vh; overflow: auto;
+    padding: 32px;
+    animation: scaleIn 0.2s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* GRIDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* SLIDER */
+  input[type="range"] {
+    width: 100%; height: 6px; border-radius: 3px;
+    background: rgba(0, 0, 0, 0.1); outline: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    background: var(--thumb-color, #888);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    background: var(--thumb-color, #888);
+  }
+  input[type="range"]:disabled::-webkit-slider-thumb {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  input[type="range"]:disabled::-moz-range-thumb {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  /* RETRO BOARD */
+  .retro-cell {
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 140px;
+    background: #FAFAF7;
+    border: 0.5px solid rgba(0, 0, 0, 0.05);
+  }
+  .retro-card {
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  /* DRAG-AND-DROP */
+  .drag-item {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: grab;
+    border: 0.5px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 6px;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .drag-item:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .drag-item:active { cursor: grabbing; }
+  .drag-item.tray { display: inline-flex; border-radius: 999px; margin: 4px; }
+  .drag-item-row { display: flex; align-items: center; gap: 8px; }
+  .drag-item-text { flex: 1; }
+  .drag-item-delete {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: transparent;
+    color: #bbb;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .drag-item:hover .drag-item-delete { opacity: 1; }
+  .drag-item-delete:hover { background: rgba(163, 45, 45, 0.1); color: #A32D2D; }
+  .drag-zone {
+    border-radius: 16px;
+    padding: 14px;
+    min-height: 200px;
+    transition: background 0.2s;
+  }
+  .drag-zone.drag-over { background: rgba(15, 27, 92, 0.05) !important; }
+  .drop-here-msg {
+    text-align: center;
+    color: #aaa;
+    font-size: 11px;
+    font-style: italic;
+    padding: 30px 10px;
+  }
+
+  /* TRAFFIC LIGHTS */
+  .light {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .light:hover { transform: scale(1.1); }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 11px; left: 8%; right: 8%;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .timeline-step {
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .timeline-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    background: white;
+    border: 2px solid #ccc;
+  }
+  .timeline-dot.filled {
+    border: none;
+  }
+
+  /* NOSCROLL */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
+  .footer-nav {
+    max-width: 1100px; margin: 0 auto;
+    padding: 32px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .helper-text { font-size: 12px; color: #888; }
+  .italic { font-style: italic; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+  .empty-state {
+    font-size: 13px; color: #aaa; font-style: italic;
+    padding: 12px;
+  }
+
+  .signal-row {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    border: 0.5px solid rgba(0, 0, 0, 0.06);
+    margin-bottom: 8px;
+  }
+
+  /* HERO HIGHLIGHT */
+  .highlight { padding: 0 8px; border-radius: 6px; }
+
+  /* JOIN CHIP */
+  .join-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin: 4px;
+  }
+  .join-chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* BANNER */
+  .banner {
+    text-align: center;
+    padding: 36px 20px;
+    border-radius: 24px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">CX · 6 months in 👋</div>
+    <div class="nav-pages" id="navPages"></div>
+    <div class="nav-right">
+      <select id="userSelect" class="user-select" style="display:none"></select>
+      <button class="reset-btn" id="resetBtn" title="Reset session">↻</button>
+    </div>
+  </div>
+</div>
+
+<div id="root"></div>
+
+<div class="footer-nav">
+  <button class="pill-btn pill-secondary" id="prevBtn">← Back</button>
+  <div class="helper-text" id="pageIndicator">1 of 8</div>
+  <button class="pill-btn pill-primary" id="nextBtn">Next →</button>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+const COLORS = [
+  { name: 'magenta',  hex: '#8E2D6F', tint: '#F4E4ED', dark: '#5e1d49' },
+  { name: 'navy',     hex: '#0F1B5C', tint: '#DDE0F0', dark: '#08113b' },
+  { name: 'cobalt',   hex: '#3D6BD3', tint: '#DCE4F7', dark: '#284791' },
+  { name: 'amber',    hex: '#C97A0E', tint: '#FDF1DE', dark: '#8a5208' },
+  { name: 'lavender', hex: '#7B5BA8', tint: '#E8DBEC', dark: '#4a3670' },
+];
+
+const state = {
+  page: 0,
+  participants: [],
+  currentUserId: null,
+  proudMoments: [],
+  successDefs: [],
+  health: { draft: {}, submitted: {} },
+  directionPin: null,
+  retroCards: { cxCont: [], cxStop: [], cxChange: [], vmoCont: [], vmoStop: [], vmoChange: [] },
+  commitments: [],
+  bauCriteria: {
+    must: ['Clear owner in receiving team', 'Metrics & reporting in place'],
+    nice: ['Peer benchmarks documented'],
+    risk: ['Funding model post-handover'],
+    tray: ['Capability built in receiving team', 'Governance & CXT touchpoints defined', 'Risks & dependencies documented', 'Run-rate budget agreed', '90-day exit support plan']
+  },
+  orgPins: [],
+  bauNotes: [],
+  orgNotes: [],
+  bolderNotes: [],
+  bolderTriggers: [],
+  readiness: {},
+  finalReflections: [],
+};
+
+const PAGES = [
+  { num: 0, label: 'Welcome' },
+  { num: 1, label: 'Celebrate' },
+  { num: 2, label: 'Health check' },
+  { num: 3, label: 'Commitments' },
+  { num: 4, label: 'BAU' },
+  { num: 5, label: 'Org evolution' },
+  { num: 6, label: 'Bold to bolder' },
+  { num: 7, label: 'Close' },
+];
+
+function currentUser() {
+  return state.participants.find(p => p.id === state.currentUserId) || null;
+}
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function render() {
+  renderNav();
+  renderPage();
+  renderFooter();
+}
+
+function renderNav() {
+  const navPages = document.getElementById('navPages');
+  navPages.innerHTML = '';
+  PAGES.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = `${p.num}. ${p.label}`;
+    if (p.num === state.page) btn.classList.add('active');
+    btn.onclick = () => { state.page = p.num; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    navPages.appendChild(btn);
+  });
+
+  const userSelect = document.getElementById('userSelect');
+  const cu = currentUser();
+  if (cu && state.participants.length > 0) {
+    userSelect.style.display = 'block';
+    userSelect.style.borderColor = cu.color.hex;
+    userSelect.style.color = cu.color.hex;
+    userSelect.style.border = `1px solid ${cu.color.hex}`;
+    userSelect.innerHTML = state.participants.map(p =>
+      `<option value="${p.id}" ${p.id === state.currentUserId ? 'selected' : ''}>${escapeHtml(p.name)}</option>`
+    ).join('');
+    userSelect.onchange = (e) => {
+      state.currentUserId = Number(e.target.value);
+      render();
+    };
+  } else {
+    userSelect.style.display = 'none';
+  }
+}
+
+function renderFooter() {
+  document.getElementById('pageIndicator').textContent = `${state.page + 1} of 8`;
+  document.getElementById('prevBtn').disabled = state.page === 0;
+  document.getElementById('nextBtn').disabled = state.page === 7;
+}
+
+document.getElementById('prevBtn').onclick = () => {
+  state.page = Math.max(0, state.page - 1);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+document.getElementById('nextBtn').onclick = () => {
+  state.page = Math.min(7, state.page + 1);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+document.getElementById('resetBtn').onclick = () => {
+  if (state.participants.length === 0) return;
+  state.page = 0;
+  state.participants = [];
+  state.currentUserId = null;
+  state.proudMoments = [];
+  state.successDefs = [];
+  state.health = { draft: {}, submitted: {} };
+  state.directionPin = null;
+  state.retroCards = { cxCont: [], cxStop: [], cxChange: [], vmoCont: [], vmoStop: [], vmoChange: [] };
+  state.commitments = [];
+  state.bauCriteria = {
+    must: ['Clear owner in receiving team', 'Metrics & reporting in place'],
+    nice: ['Peer benchmarks documented'],
+    risk: ['Funding model post-handover'],
+    tray: ['Capability built in receiving team', 'Governance & CXT touchpoints defined', 'Risks & dependencies documented', 'Run-rate budget agreed', '90-day exit support plan']
+  };
+  state.orgPins = [];
+  state.bauNotes = [];
+  state.orgNotes = [];
+  state.bolderNotes = [];
+  state.bolderTriggers = [];
+  state.readiness = {};
+  state.finalReflections = [];
+  render();
+};
+
+function shapesBg(density) {
+  const sparse = [
+    { type: 'circle', size: 60, top: '10%', left: '85%', color: COLORS[3].hex, opacity: 0.4 },
+    { type: 'square', size: 40, top: '70%', left: '5%', color: COLORS[0].hex, opacity: 0.5, rotate: 20 },
+    { type: 'circle', size: 30, top: '45%', left: '92%', color: COLORS[4].hex, opacity: 0.5 },
+  ];
+  const full = [
+    { type: 'circle', size: 110, top: '5%', left: '82%', color: COLORS[3].hex, opacity: 0.9 },
+    { type: 'circle', size: 50, top: '18%', left: '70%', color: COLORS[0].hex, opacity: 0.85 },
+    { type: 'square', size: 70, top: '60%', left: '88%', color: COLORS[2].hex, opacity: 0.85, rotate: 15 },
+    { type: 'triangle', top: '55%', left: '74%', color: COLORS[4].hex, opacity: 0.85 },
+    { type: 'circle', size: 32, top: '40%', left: '90%', color: COLORS[1].hex, opacity: 0.85 },
+    { type: 'circle', size: 18, top: '12%', left: '60%', color: COLORS[3].hex, opacity: 0.7 },
+  ];
+  const shapes = density === 'sparse' ? sparse : full;
+  return `<div class="shapes-bg">${shapes.map(s => {
+    if (s.type === 'circle') return `<div class="shape circle" style="width:${s.size}px;height:${s.size}px;top:${s.top};left:${s.left};background:${s.color};opacity:${s.opacity}"></div>`;
+    if (s.type === 'square') return `<div class="shape square" style="width:${s.size}px;height:${s.size}px;top:${s.top};left:${s.left};background:${s.color};opacity:${s.opacity};transform:rotate(${s.rotate}deg)"></div>`;
+    return `<div class="shape triangle" style="top:${s.top};left:${s.left};border-bottom:56px solid ${s.color};opacity:${s.opacity}"></div>`;
+  }).join('')}</div>`;
+}
+
+function badge(p, size) {
+  if (!p) return '';
+  return `<div class="participant-badge ${size === 'lg' ? 'lg' : ''}" style="background:${p.color.hex}">${escapeHtml(p.name.slice(0,2).toUpperCase())}</div>`;
+}
+
+function reactionBar(reactions, fnName, id) {
+  const reacts = reactions || { heart: [], like: [], q: [] };
+  const cu = currentUser();
+  const cuId = cu ? cu.id : null;
+  const hasReacted = (k) => cuId != null && Array.isArray(reacts[k]) && reacts[k].some(x => String(x) === String(cuId));
+  const count = (k) => Array.isArray(reacts[k]) ? reacts[k].length : 0;
+  const call = (k) => `window.${fnName}(${JSON.stringify(id)},'${k}')`;
+  const btn = (k, emoji, title) => {
+    const reacted = hasReacted(k);
+    const c = count(k);
+    return `<button class="reaction-btn${reacted ? ' reacted' : ''}" onclick="${call(k)}" title="${title}"${reacted ? ' style="background:rgba(15,27,92,0.08);border-color:rgba(15,27,92,0.2)"' : ''}>${emoji}${c > 0 ? `<span class="count">${c}</span>` : ''}</button>`;
+  };
+  return `<div class="reactions">
+    ${btn('heart', '❤️', '100% agree')}
+    ${btn('like', '👍', 'like')}
+    ${btn('q', '❓', 'discuss')}
+  </div>`;
+}
+
+function triggerRagBar(trigger) {
+  const cu = currentUser();
+  const cuId = cu ? cu.id : null;
+  const ratings = trigger.ratings || {};
+  const colorMap = { green: '#3B6D11', amber: '#C97A0E', red: '#A32D2D' };
+  const bgMap    = { green: '#EAF3DE', amber: '#FDF1DE', red: '#FCEBEB' };
+
+  const dotsFor = (rag) => Object.entries(ratings).filter(([_, v]) => v === rag);
+  const cuRating = cuId != null ? ratings[cuId] : null;
+
+  const lightBtn = (rag) => {
+    const active = cuRating === rag;
+    return `<button class="light" onclick="window.rateTrigger(${JSON.stringify(trigger.id)},'${rag}')" style="width:22px;height:22px;background:${active ? colorMap[rag] : bgMap[rag]};${active ? `border:2px solid ${colorMap[rag]}` : 'border:none'};opacity:${!cuRating || active ? 1 : 0.4}" title="${rag === 'green' ? 'strong signal' : rag === 'amber' ? 'partial signal' : 'not yet'}"></button>`;
+  };
+
+  const dotRow = (rag) => {
+    const list = dotsFor(rag);
+    if (list.length === 0) return '';
+    return `<div style="display:flex;gap:3px;align-items:center">
+      <div style="width:6px;height:6px;border-radius:50%;background:${colorMap[rag]}"></div>
+      ${list.map(([pid]) => {
+        const p = state.participants.find(x => String(x.id) === String(pid));
+        if (!p) return '';
+        return `<div title="${escapeHtml(p.name)}" style="width:11px;height:11px;border-radius:50%;background:${p.color.hex};border:1.5px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.15)"></div>`;
+      }).join('')}
+    </div>`;
+  };
+
+  return `<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px">
+      ${['green', 'amber', 'red'].map(dotRow).filter(Boolean).join('') || '<span style="font-size:11px;color:#aaa;font-style:italic">No ratings yet</span>'}
+    </div>
+    <div style="display:flex;gap:5px">
+      ${['green', 'amber', 'red'].map(lightBtn).join('')}
+    </div>
+  </div>`;
+}
+
+function toggleReaction(reactions, k) {
+  const cu = currentUser();
+  if (!cu) return;
+  if (!Array.isArray(reactions[k])) reactions[k] = [];
+  const idx = reactions[k].findIndex(x => String(x) === String(cu.id));
+  if (idx >= 0) reactions[k].splice(idx, 1);
+  else reactions[k].push(cu.id);
+}
+
+function eyebrow(color, text) {
+  return `<div class="eyebrow" style="color:${color}">— ${text}</div>`;
+}
+
+function notesSection(stateKey, fnName, placeholder) {
+  const cu = currentUser();
+  const notes = state[stateKey] || [];
+  return `
+    <div class="card" style="margin-top:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div class="eyebrow" style="color:${COLORS[2].hex}">NOTES & DECISIONS · LIVE</div>
+          <div class="helper-text">Capture decisions, points of tension, follow-ups. Submit to share with the room.</div>
+        </div>
+        <div style="font-size:11px;color:#888">${notes.length} ${notes.length === 1 ? 'note' : 'notes'} shared</div>
+      </div>
+
+      ${cu ? `
+        <textarea id="${stateKey}_input" class="textarea" rows="3" placeholder="${placeholder}" style="width:100%;margin-bottom:8px"></textarea>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="pill-btn pill-primary" onclick="window.${fnName}()">Submit note →</button>
+        </div>
+      ` : `<div class="helper-text" style="padding:12px;background:#FAFAF7;border-radius:8px">Join from the welcome page to submit notes.</div>`}
+
+      ${notes.length > 0 ? `
+        <div style="margin-top:16px;padding-top:16px;border-top:0.5px solid rgba(0,0,0,0.06)">
+          ${notes.map(n => `
+            <div style="display:flex;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;background:${n.color.tint}">
+              <div class="participant-badge" style="background:${n.color.hex}">${escapeHtml(n.name.slice(0,2).toUpperCase())}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:11px;font-weight:500;margin-bottom:2px;color:${n.color.dark}">${escapeHtml(n.name)}</div>
+                <div style="font-size:14px;line-height:1.5;white-space:pre-wrap;color:${n.color.dark}">${escapeHtml(n.text)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function attachNotesSection(stateKey, fnName) {
+  window[fnName] = () => {
+    const cu = currentUser();
+    if (!cu) return;
+    const input = document.getElementById(`${stateKey}_input`);
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    state[stateKey].push({
+      id: Date.now() + Math.random(),
+      text,
+      name: cu.name,
+      color: cu.color,
+    });
+    input.value = '';
+    render();
+  };
+}
+
+function showModal(content) {
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `<div class="modal-backdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()">${content}<div style="margin-top:24px;text-align:right"><button class="pill-btn pill-secondary" onclick="closeModal()">Close</button></div></div></div>`;
+}
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+window.closeModal = closeModal;
+
+function renderPage() {
+  const root = document.getElementById('root');
+  const fns = [renderWelcome, renderCelebrate, renderHealthRetro, renderCommitments, renderBAU, renderOrgEvolution, renderBoldToBolder, renderClose];
+  root.innerHTML = fns[state.page]();
+  attachPageHandlers();
+}
+
+function attachPageHandlers() {
+  const fns = [attachWelcome, attachCelebrate, attachHealthRetro, attachCommitments, attachBAU, attachOrgEvolution, attachBoldToBolder, attachClose];
+  if (fns[state.page]) fns[state.page]();
+}
+
+function renderWelcome() {
+  const cu = currentUser();
+  return `
+    <div class="page">
+      ${shapesBg('full')}
+      <div class="content">
+        <div style="display:inline-block;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:500;color:white;background:${COLORS[0].hex};margin-bottom:16px">
+          Leadership session · 6-month reflection
+        </div>
+        <h1 style="margin-bottom:20px;max-width:720px">
+          Welcome! <span class="highlight" style="background:${COLORS[3].tint}">Let's spend a day</span> actually talking.
+        </h1>
+        <p style="font-size:15px;color:#666;line-height:1.6;max-width:560px;margin-bottom:32px">
+          Type your name to enter the room. You'll be assigned a color — your answers will appear in that color throughout the day.
+        </p>
+
+        <div class="card" style="max-width:560px;margin-bottom:32px">
+          <div style="display:flex;gap:8px">
+            <input type="text" id="nameInput" placeholder="Your name" class="input" style="flex:1" />
+            <button class="pill-btn pill-primary" id="joinBtn">Join →</button>
+          </div>
+          ${state.participants.length > 0 ? `
+            <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(0,0,0,0.06)">
+              <div style="font-size:11px;color:#888;letter-spacing:1px;margin-bottom:12px">IN THE ROOM (${state.participants.length})</div>
+              <div>
+                ${state.participants.map(p => `
+                  <span class="join-chip" style="background:${p.color.tint};color:${p.color.dark}">
+                    <span class="join-chip-dot" style="background:${p.color.hex}"></span>
+                    ${escapeHtml(p.name)}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div style="border-radius:20px;padding:24px;margin-bottom:32px;max-width:900px;background:${COLORS[0].tint}">
+          ${eyebrow(COLORS[0].hex, 'OUR GOAL FOR TODAY')}
+          <p style="font-size:15px;line-height:1.6;color:${COLORS[0].dark}">
+            Take a meaningful pause at the 6-month mark to honestly assess where the CX Transformation stands — with a focus on impact over activity, program health, and direction. Leave with clear alignment on where we're going and what needs to change.
+          </p>
+        </div>
+
+        <div style="max-width:900px">
+          ${eyebrow(COLORS[2].hex, 'AGENDA')}
+          <h2 style="margin-bottom:20px">How we'll spend the day</h2>
+          <div class="grid-2">
+            <div class="card">
+              <div class="eyebrow" style="color:${COLORS[0].hex}">— MORNING</div>
+              ${[
+                { title: "Let's celebrate our success", mins: '30 min' },
+                { title: 'Program health check & retro', mins: '45 min' },
+                { title: 'Commitments going forward', mins: '30 min' },
+              ].map(item => `
+                <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:12px">
+                  <div style="font-size:13px;font-weight:500;color:${COLORS[1].hex}">${item.title}</div>
+                  <div style="font-size:11px;color:#aaa">${item.mins}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="card">
+              <div class="eyebrow" style="color:${COLORS[2].hex}">— AFTERNOON</div>
+              ${[
+                { title: 'Looking ahead: Transition to BAU', mins: '40 min' },
+                { title: 'Looking ahead: From bold to bolder', mins: '40 min' },
+                { title: 'Looking ahead: CX org evolution', mins: '40 min' },
+              ].map(item => `
+                <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:12px">
+                  <div style="font-size:13px;font-weight:500;color:${COLORS[1].hex}">${item.title}</div>
+                  <div style="font-size:11px;color:#aaa">${item.mins}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        ${cu ? `
+          <div style="margin-top:40px">
+            <button class="pill-btn pill-primary" id="startBtn">Start the session →</button>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function attachWelcome() {
+  const nameInput = document.getElementById('nameInput');
+  const joinBtn = document.getElementById('joinBtn');
+  const join = () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    const colorIdx = state.participants.length % COLORS.length;
+    const newP = { id: Date.now() + Math.random(), name, color: COLORS[colorIdx] };
+    state.participants.push(newP);
+    state.currentUserId = newP.id;
+    nameInput.value = '';
+    render();
+  };
+  joinBtn.onclick = join;
+  nameInput.onkeydown = (e) => { if (e.key === 'Enter') join(); };
+  nameInput.focus();
+
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) startBtn.onclick = () => { state.page = 1; render(); window.scrollTo({ top: 0 }); };
+}
+
+function renderCelebrate() {
+  const cu = currentUser();
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+
+        <div class="banner" style="background:${COLORS[0].hex}">
+          <div class="shape circle" style="position:absolute;top:12px;right:32px;width:48px;height:48px;background:${COLORS[3].hex}"></div>
+          <div class="shape circle" style="position:absolute;bottom:12px;left:48px;width:32px;height:32px;background:${COLORS[2].hex}"></div>
+          <h1 class="banner">We're 6 months in! 🎉</h1>
+        </div>
+
+        ${eyebrow(COLORS[0].hex, 'SUCCESSES & LEARNINGS')}
+        <h2 style="margin-bottom:16px">Three stories from the last six months</h2>
+        <div class="grid-3" style="margin-bottom:40px">
+          ${[
+            { id: 's1', title: '4 Early Experience Teams in flight', subtitle: 'L&D: Equipping the field to show up better', color: COLORS[0] },
+            { id: 's2', title: '10 Jumpstarts & experiments proving successful', subtitle: 'From static research to AI-enabled insights', color: COLORS[2] },
+            { id: 's3', title: '2 Learning stories', subtitle: 'Fail fast, build better: pressure-testing the future model', color: COLORS[4] },
+          ].map(s => `
+            <button class="tile" data-story="${s.id}" style="background:${s.color.tint};color:${s.color.dark};min-height:160px">
+              <div style="width:36px;height:36px;border-radius:50%;margin-bottom:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:500;background:${s.color.hex}">↗</div>
+              <div style="font-weight:500;font-size:14px;margin-bottom:6px">${s.title}</div>
+              <div style="font-size:12px;opacity:0.85;line-height:1.4">${s.subtitle}</div>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="card" style="margin-bottom:40px">
+          ${eyebrow(COLORS[3].hex, 'QUESTION FOR THE ROOM')}
+          <h3 style="margin-bottom:16px">What are you most proud of from the last 6 months? What's a moment that was meaningful to you?</h3>
+          ${cu ? `
+            <div style="display:flex;gap:8px;margin-bottom:16px">
+              <input type="text" id="proudInput" placeholder="Share a moment..." class="input" style="flex:1" />
+              <button class="pill-btn pill-primary" id="proudBtn">Share</button>
+            </div>
+          ` : `<div class="helper-text" style="margin-bottom:16px">Join from the welcome page to share.</div>`}
+          <div>
+            ${state.proudMoments.length === 0 ? `<div class="empty-state">Nothing shared yet — be the first.</div>` :
+              state.proudMoments.map(p => `
+                <div style="display:flex;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;background:${p.color.tint}">
+                  ${badge({ name: p.name, color: p.color })}
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:11px;font-weight:500;margin-bottom:2px;color:${p.color.dark}">${escapeHtml(p.name)}</div>
+                    <p style="font-size:14px;color:${p.color.dark}">${escapeHtml(p.text)}</p>
+                    ${reactionBar(p.reactions, 'reactProud', p.id)}
+                  </div>
+                </div>
+              `).join('')
+            }
+          </div>
+        </div>
+
+        <h3 class="sr-only">By the numbers</h3>
+        <div class="grid-4" style="margin-bottom:40px">
+          ${[
+            { num: '4', label: 'Experiments completed', color: COLORS[0], idx: 0 },
+            { num: '12', label: 'Experiments kicked off', sub: '4/12 prioritized for Q2', color: COLORS[2], idx: 1 },
+            { num: '18', label: 'Experiments planned', color: COLORS[3], idx: 2 },
+            { num: '50+', label: 'Jazzicians actively involved', color: COLORS[4], idx: 3 },
+          ].map(s => `
+            <button class="tile stat-tile" data-stat="${s.idx}" style="background:${s.color.tint};color:${s.color.dark}">
+              <div class="stat-num" style="color:${s.color.hex}">${s.num}</div>
+              <div style="font-size:12px;font-weight:500;line-height:1.2">${s.label}</div>
+              ${s.sub ? `<div style="font-size:10px;margin-top:4px;opacity:0.7">${s.sub}</div>` : ''}
+            </button>
+          `).join('')}
+        </div>
+
+        <div style="border-radius:24px;padding:28px;position:relative;overflow:hidden;background:${COLORS[1].hex};color:white">
+          <div class="shape circle" style="position:absolute;top:12px;right:20px;width:64px;height:64px;background:${COLORS[3].hex}"></div>
+          <div class="shape square" style="position:absolute;bottom:-20px;right:80px;width:40px;height:40px;background:${COLORS[0].hex};transform:rotate(20deg)"></div>
+          <div style="position:relative;max-width:60%">
+            ${eyebrow(COLORS[3].hex, 'THE BIG QUESTION')}
+            <h2 style="color:white;margin-bottom:8px;font-size:24px;line-height:1.2">
+              We've done a lot of great work — but are we driving the <em style="color:${COLORS[3].hex};font-style:normal">impact</em> we set out to achieve, or just <em style="color:${COLORS[0].hex};font-style:normal">activity</em>?
+            </h2>
+            <p style="font-size:13px;opacity:0.8;margin-bottom:20px">Rewrite your definition of success for the CX Transformation.</p>
+            ${cu ? `
+              <div style="display:flex;gap:8px">
+                <input type="text" id="defInput" placeholder="Success looks like..." class="input" style="flex:1;background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2)" />
+                <button class="pill-btn" id="defBtn" style="background:${COLORS[3].hex};color:white">Submit</button>
+              </div>
+            ` : ''}
+          </div>
+          ${state.successDefs.length > 0 ? `
+            <div class="grid-2" style="margin-top:20px;position:relative">
+              ${state.successDefs.map(d => `
+                <div style="padding:12px;border-radius:12px;display:flex;gap:8px;background:rgba(255,255,255,0.08)">
+                  ${badge({ name: d.name, color: d.color })}
+                  <div style="flex:1">
+                    <div style="font-size:11px;font-weight:500;margin-bottom:2px">${escapeHtml(d.name)}</div>
+                    <div style="font-size:13px">${escapeHtml(d.text)}</div>
+                    ${reactionBar(d.reactions, 'reactDef', d.id)}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+const STORIES = {
+  s1: { color: COLORS[0], type: 'SUCCESS STORY', title: 'L&D: Equipping the field to show up better', subtitle: '4 Early Experience Teams in flight',
+    detail: 'Transformation of the L&D team to productize where appropriate while maintaining specialized expertise. Field-facing teams get more consistent, timely learning. Axonify delivers just-in-time micro-learning (~13% knowledge growth) and is being piloted across oncology MSLs and Global/EU teams. CRM applies adult learning principles to embed learning into workflows — making it practical and usable for the field, beyond a tracking tool.' },
+  s2: { color: COLORS[2], type: 'SUCCESS STORY', title: 'From static research to AI-enabled insights', subtitle: '10 Jumpstarts & experiments proving successful',
+    detail: '2-week sprint with 26 members of US Epidiolex team. AI chatbot layered on existing market research library. Marketers can access, connect, and apply insights more easily. Lessons: adoption requires intention not just access; ease of use isn\'t the barrier — guiding when and why to use it is. Trust must be actively shaped.' },
+  s3: { color: COLORS[4], type: 'LEARNING STORY', title: 'Fail fast, build better: pressure-testing the future operating model', subtitle: '2 Learning stories',
+    detail: 'Sam O ran a pilot workshop with closely connected workstreams to pressure-test future ways of working. The session sparked valuable cross-workstream discussion. Learning: more structure upfront, single pre-aligned scenario, light pre-work to surface assumptions. Next time, anchor on one clear scenario in advance.' },
+};
+
+const STATS_DETAIL = [
+  { num: '4', label: 'Experiments completed', color: COLORS[0],
+    items: [
+      { name: 'FUSE AI-enabled chat bot', desc: 'AI layer on the market research library to help marketers work smarter and adopt AI in their daily workflow.' },
+      { name: 'KAM360 benchmarking', desc: 'Full review of Key Account Management at Jazz to shape the future KAM role.' },
+      { name: 'Redefining interactions with KOLs', desc: 'New trusted materials and a better outreach approach at congresses.' },
+      { name: 'KOL tactical planning', desc: 'Aligned Commercial and R&D teams on KOL engagement at conferences.' },
+    ]},
+  { num: '12', label: 'Experiments kicked off', sub: '4/12 prioritized for Q2', color: COLORS[2],
+    items: [
+      { name: 'Jazz Patient & Caregiver Forum', desc: 'Refreshed P&C forum spotlighting stories from Jazz employees.' },
+      { name: 'Key Account Excellence (Sleep)', desc: 'Sleep field teams set their own account goals — shifting from activity to impact.' },
+      { name: 'Sleep Patient Committee', desc: 'Cross-indication patient committee to bring real patient voices into Jazz work.' },
+      { name: 'HCP Digital Visualization Aid', desc: 'Field teams from paper to digital engagement tools.' },
+    ]},
+  { num: '18', label: 'Experiments planned', color: COLORS[3],
+    items: [
+      { name: 'HCP', desc: 'Aligned footprints, optimized TL advocacy, education in NPP environment, sleep targeting & segmentation.' },
+      { name: 'Patient', desc: 'Pre-RX mentor program (EMD), pre-RX field nurse educator program (Sleep), patient experience champion, EMD scorecard.' },
+      { name: 'KOL', desc: 'Digital KOL, KOL Ninja, Unified Congress Strategy, Rapid Strategy Cycles, Journey-Anchored Sprint.' },
+      { name: 'FUSE', desc: 'Global Marketing Office, Shared KPI Accountability, Journey Pod Activation.' },
+    ]},
+  { num: '50+', label: 'Jazzicians actively involved', color: COLORS[4],
+    items: [
+      { name: 'The crew', desc: 'Sunny Goyal, Jonathan Hayden, Adelpha Larkin, John Stabile, Greg Rechtenbach, Patrick Koch, Carolyn Schwartz, Chris Weichel, Dave Tworek, Craig Readler, Galina Perel, LeAnn Ledweg, Sonya Taylor, Mandy Breckbill, Greg Wedemeyer, Edouard Lasalle, Jeff Allen, Chad Pulliam, Mike Sargent, Brandon Shaffer, Diana Diomede, Geraldine Passemard, Julia Altenberger, Sarah McMann, Arnela Alickovic, Isadora Patrizi, Megan Reilly, Brent Weakley, Martin Harris, Liz Cohen, Brad Thompson, Monica Beckholt, Victoria Berenholz, Ray Ledford, Shari Kulkis, Lydia Wall, Amy Haines, Mehmet Dincer, Danielle Henek, Heather Hawes, Genna Burton, Kate Kitsopoulos, Tony Calucchia, Ethan Fingerman, Anjali Zaffuto.' },
+    ]},
+];
+
+function attachCelebrate() {
+  document.querySelectorAll('[data-story]').forEach(el => {
+    el.onclick = () => {
+      const s = STORIES[el.dataset.story];
+      showModal(`
+        <div class="eyebrow" style="color:${s.color.hex}">— ${s.type}</div>
+        <h2 style="margin-bottom:6px">${s.title}</h2>
+        <div style="font-size:13px;color:#888;margin-bottom:20px">${s.subtitle}</div>
+        <div style="padding:20px;border-radius:16px;font-size:14px;line-height:1.6;background:${s.color.tint};color:${s.color.dark}">${s.detail}</div>
+      `);
+    };
+  });
+
+  document.querySelectorAll('[data-stat]').forEach(el => {
+    el.onclick = () => {
+      const s = STATS_DETAIL[Number(el.dataset.stat)];
+      showModal(`
+        <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:20px">
+          <div style="font-size:72px;font-weight:500;line-height:1;color:${s.color.hex}">${s.num}</div>
+          <div>
+            <div style="font-size:16px;font-weight:500;color:${COLORS[1].hex}">${s.label}</div>
+            ${s.sub ? `<div style="font-size:12px;color:#888">${s.sub}</div>` : ''}
+          </div>
+        </div>
+        ${s.items.map(it => `
+          <div style="padding:14px;border-radius:12px;margin-bottom:10px;background:${s.color.tint}">
+            <div style="font-weight:500;font-size:14px;margin-bottom:4px;color:${s.color.dark}">${it.name}</div>
+            <div style="font-size:13px;line-height:1.6;color:${s.color.dark};opacity:0.85">${it.desc}</div>
+          </div>
+        `).join('')}
+      `);
+    };
+  });
+
+  const cu = currentUser();
+  const proudInput = document.getElementById('proudInput');
+  const proudBtn = document.getElementById('proudBtn');
+  if (proudBtn && cu) {
+    const addProud = () => {
+      const text = proudInput.value.trim();
+      if (!text) return;
+      state.proudMoments.push({ id: Date.now() + Math.random(), text, name: cu.name, color: cu.color, reactions: { heart: [], like: [], q: [] } });
+      proudInput.value = '';
+      render();
+    };
+    proudBtn.onclick = addProud;
+    proudInput.onkeydown = (e) => { if (e.key === 'Enter') addProud(); };
+  }
+
+  const defInput = document.getElementById('defInput');
+  const defBtn = document.getElementById('defBtn');
+  if (defBtn && cu) {
+    const addDef = () => {
+      const text = defInput.value.trim();
+      if (!text) return;
+      state.successDefs.push({ id: Date.now() + Math.random(), text, name: cu.name, color: cu.color, reactions: { heart: [], like: [], q: [] } });
+      defInput.value = '';
+      render();
+    };
+    defBtn.onclick = addDef;
+    defInput.onkeydown = (e) => { if (e.key === 'Enter') addDef(); };
+  }
+
+  window.reactProud = (id, k) => {
+    const p = state.proudMoments.find(x => String(x.id) === String(id));
+    if (p) { toggleReaction(p.reactions, k); render(); }
+  };
+  window.reactDef = (id, k) => {
+    const p = state.successDefs.find(x => String(x.id) === String(id));
+    if (p) { toggleReaction(p.reactions, k); render(); }
+  };
+}
+
+function renderHealthRetro() {
+  const cu = currentUser();
+  const retroCols = [
+    { key: 'Cont', label: 'CONTINUE', sub: 'What we protect', color: '#3B6D11', bg: '#EAF3DE' },
+    { key: 'Stop', label: 'STOP', sub: 'Noise & wasted energy', color: '#A32D2D', bg: '#FCEBEB' },
+    { key: 'Change', label: 'START / CHANGE', sub: 'Do differently now', color: '#185FA5', bg: '#E6F1FB' },
+  ];
+  const retroRows = [
+    { key: 'cx', label: 'CX transformation', color: COLORS[4] },
+    { key: 'vmo', label: 'VMO', color: COLORS[2] },
+  ];
+
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+        <div class="card" style="margin-bottom:40px;padding:20px 24px;max-width:760px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:0.5px solid rgba(0,0,0,0.08);margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid rgba(0,0,0,0.35)"></div>
+              <div>
+                <div style="font-weight:500;font-size:15px;color:#1a1a2e">Program health check</div>
+                <div style="font-size:11px;color:#888">60-second pulse · anonymous</div>
+              </div>
+            </div>
+            <div style="font-size:11px;padding:6px 14px;border-radius:999px;border:0.5px solid rgba(0,0,0,0.12);color:#666;text-align:center;line-height:1.3">Step 1 of<br>2</div>
+          </div>
+
+          <div style="font-weight:500;font-size:14px;color:#1a1a2e;margin-bottom:2px">How healthy does the program feel right now?</div>
+          <div style="font-size:12px;color:#888;margin-bottom:16px">Drag each dial. Gut answers only.</div>
+
+          ${(() => {
+            const dimensions = [
+              { key: 'engagement',    label: 'Engagement',    help: 'Are people leaning in?',       left: 'Checked out', right: 'All in',         color: COLORS[2] },
+              { key: 'energy',        label: 'Energy',        help: 'Momentum and morale',          left: 'Drained',     right: 'Buzzing',        color: COLORS[3] },
+              { key: 'prioritisation',label: 'Prioritisation',help: 'Working on the right things?', left: 'Scattered',   right: 'Laser-focused',  color: COLORS[4] },
+              { key: 'ways',          label: 'Ways of working',help:'Rituals, decisions, flow',     left: 'Friction',    right: 'Smooth',         color: COLORS[0] },
+            ];
+            const cuId = cu ? cu.id : null;
+            const submittedIds = Object.keys(state.health.submitted);
+            const hasSubmitted = cuId != null && state.health.submitted[cuId];
+            const draft = cuId != null ? (state.health.draft[cuId] || { engagement: 50, energy: 50, prioritisation: 50, ways: 50 }) : null;
+
+            const avg = (key) => {
+              if (submittedIds.length === 0) return null;
+              const sum = submittedIds.reduce((acc, id) => acc + state.health.submitted[id][key], 0);
+              return Math.round(sum / submittedIds.length);
+            };
+
+            return `
+              <div class="grid-2" style="margin-bottom:20px;gap:12px">
+                ${dimensions.map(s => {
+                  const teamAvg = avg(s.key);
+                  const displayNum = teamAvg !== null ? teamAvg : (draft ? draft[s.key] : 50);
+                  const sliderVal = draft ? draft[s.key] : 50;
+                  const dots = state.participants
+                    .filter(p => state.health.submitted[p.id])
+                    .map(p => ({ id: p.id, color: p.color, name: p.name, val: state.health.submitted[p.id][s.key] }));
+
+                  return `
+                    <div style="border-radius:10px;padding:14px 16px;border:0.5px solid rgba(0,0,0,0.08);background:white${hasSubmitted ? ';opacity:0.92' : ''}">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+                        <div style="width:13px;height:13px;border-radius:3px;border:1.5px solid rgba(0,0,0,0.3)"></div>
+                        <div style="font-weight:500;font-size:13px;color:#1a1a2e">${s.label}</div>
+                      </div>
+                      <div style="font-size:12px;color:#888;margin-bottom:8px;padding-left:21px">${s.help}</div>
+                      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+                        <div style="font-size:28px;font-weight:500;color:#1a1a2e;line-height:1">${displayNum}</div>
+                        <div style="font-size:10px;color:#aaa">${teamAvg !== null ? `team avg · ${dots.length}/${state.participants.length}` : (cu ? 'your guess' : '\u2014')}</div>
+                      </div>
+
+                      <input type="range" min="0" max="100" step="1" value="${sliderVal}" data-health="${s.key}" ${hasSubmitted || !cu ? 'disabled' : ''} style="--thumb-color:${cu ? cu.color.hex : '#888'};width:100%;${hasSubmitted ? 'cursor:not-allowed' : ''}" />
+
+                      <div style="position:relative;height:14px;margin-top:2px">
+                        ${dots.map(d => `
+                          <div style="position:absolute;left:${d.val}%;top:50%;width:10px;height:10px;border-radius:50%;background:${d.color.hex};transform:translate(-50%,-50%);border:1.5px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.2);${cu && String(d.id) === String(cu.id) ? 'z-index:2;width:12px;height:12px' : ''}" title="${escapeHtml(d.name)}: ${d.val}"></div>
+                        `).join('')}
+                      </div>
+
+                      <div style="display:flex;justify-content:space-between;font-size:10px;color:#aaa;margin-top:2px">
+                        <span>${s.left}</span><span>${s.right}</span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          })()}
+
+          <div style="font-weight:500;font-size:14px;color:#1a1a2e;margin-bottom:2px">Direction & pace — drop your pin</div>
+          <div style="font-size:12px;color:#888;margin-bottom:14px">Where does the program sit today?</div>
+
+          <div style="position:relative;width:100%;aspect-ratio:1/1;max-width:520px;margin:0 auto 16px;border-radius:10px;background:#FAFAF7;border:0.5px solid rgba(0,0,0,0.08);cursor:crosshair" id="scatter">
+            <div style="position:absolute;top:0;left:50%;right:0;bottom:50%;background:rgba(159,225,203,0.35);border-top-right-radius:10px"></div>
+
+            <div style="position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(0,0,0,0.12)"></div>
+            <div style="position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,0.12)"></div>
+
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:1px;color:#888">TOO FAST</div>
+            <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:1px;color:#888">TOO SLOW</div>
+            <div style="position:absolute;left:14px;top:50%;font-size:10px;letter-spacing:1px;color:#888;writing-mode:vertical-rl;transform:rotate(180deg)">OFF COURSE</div>
+            <div style="position:absolute;right:14px;top:50%;font-size:10px;letter-spacing:1px;color:#888;writing-mode:vertical-rl;transform:rotate(180deg) translateY(0)">ON COURSE</div>
+            <div style="position:absolute;top:12px;right:18px;font-size:11px;font-weight:500;color:#0F6E56">Sweet spot</div>
+
+            ${state.participants.filter(p => p.pin).map(p => `
+              <div style="position:absolute;left:${p.pin.x}%;top:${p.pin.y}%;width:14px;height:14px;border-radius:50%;background:${p.color.hex};transform:translate(-50%,-50%);border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);${cu && p.id === cu.id ? 'z-index:2' : 'opacity:0.55'}" title="${escapeHtml(p.name)}"></div>
+            `).join('')}
+          </div>
+
+          <div style="display:flex;justify-content:center;gap:20px;margin-bottom:16px;font-size:11px;color:#666">
+            ${cu ? `<div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:${cu.color.hex}"></div>You${cu.pin ? '' : ''}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#aaa"></div>Team so far (${state.participants.filter(p => p.pin).length})</div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:0.5px solid rgba(0,0,0,0.08)">
+            <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#888">
+              <span>${Object.keys(state.health.submitted).length} of ${state.participants.length} submitted</span>
+              <div style="display:flex;gap:3px">
+                ${state.participants.map(p => `<div title="${escapeHtml(p.name)}${state.health.submitted[p.id] ? ' \u2713' : ' \u2014 pending'}" style="width:10px;height:10px;border-radius:50%;background:${p.color.hex};opacity:${state.health.submitted[p.id] ? 1 : 0.25}"></div>`).join('')}
+              </div>
+            </div>
+            ${cu ? (state.health.submitted[cu.id] ? `
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:#0F6E56">✓ You've submitted</span>
+                <button class="pill-btn" id="unsubmitHealth" style="background:transparent;border:1px solid rgba(0,0,0,0.15);color:#666;padding:6px 12px;font-size:11px">Edit</button>
+              </div>
+            ` : `
+              <button class="pill-btn" id="submitHealth" style="background:#1a1a2e;color:white">Submit my answers →</button>
+            `) : `<div style="font-size:12px;color:#aaa">Join from the welcome page to submit</div>`}
+          </div>
+        </div>
+
+        ${eyebrow(COLORS[0].hex, 'RETRO BOARD')}
+        <h2 style="margin-bottom:6px">Continue / Stop / Change</h2>
+        <p class="helper-text" style="margin-bottom:20px">Capture what's working, what to drop, and what to do differently — for each lane.</p>
+
+        <div class="card">
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+            <div></div>
+            ${retroCols.map(c => `
+              <div style="text-align:center;padding:8px;border-radius:12px;background:${c.bg};color:${c.color}">
+                <div style="font-weight:500;font-size:12px;letter-spacing:1px">${c.label}</div>
+                <div style="font-size:10px;opacity:0.8">${c.sub}</div>
+              </div>
+            `).join('')}
+          </div>
+          ${retroRows.map(row => `
+            <div style="display:grid;grid-template-columns:120px 1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+              <div style="border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px 8px;background:${row.color.tint};color:${row.color.dark}">
+                <div style="font-weight:500;font-size:13px">${row.label}</div>
+              </div>
+              ${retroCols.map(col => {
+                const ck = row.key + col.key;
+                return `
+                  <div class="retro-cell">
+                    ${state.retroCards[ck].map(card => `
+                      <div class="retro-card" style="background:${card.color.tint};color:${card.color.dark}">
+                        ${escapeHtml(card.text)}
+                        <div class="reactions" style="margin-top:4px">
+                          ${(() => {
+                            const cuId2 = cu ? cu.id : null;
+                            const has = (k) => cuId2 != null && card.reactions[k].some(x => String(x) === String(cuId2));
+                            const cnt = (k) => card.reactions[k].length;
+                            const style = (k) => has(k) ? ' style="background:rgba(15,27,92,0.08);border-color:rgba(15,27,92,0.2)"' : '';
+                            return `
+                              <button class="reaction-btn" onclick="window.reactRetro('${ck}',${JSON.stringify(card.id)},'heart')"${style('heart')}>❤️${cnt('heart') > 0 ? `<span class="count">${cnt('heart')}</span>` : ''}</button>
+                              <button class="reaction-btn" onclick="window.reactRetro('${ck}',${JSON.stringify(card.id)},'like')"${style('like')}>👍${cnt('like') > 0 ? `<span class="count">${cnt('like')}</span>` : ''}</button>
+                              <button class="reaction-btn" onclick="window.reactRetro('${ck}',${JSON.stringify(card.id)},'q')"${style('q')}>❓${cnt('q') > 0 ? `<span class="count">${cnt('q')}</span>` : ''}</button>
+                            `;
+                          })()}
+                        </div>
+                      </div>
+                    `).join('')}
+                    ${cu ? `<input type="text" class="input-small" data-retro="${ck}" placeholder="+ add..." style="width:100%;margin-top:4px" />` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function attachHealthRetro() {
+  const cu = currentUser();
+
+  document.querySelectorAll('[data-health]').forEach(el => {
+    el.oninput = (e) => {
+      if (!cu) return;
+      if (state.health.submitted[cu.id]) return; // locked after submit
+      const key = el.dataset.health;
+      const val = Number(e.target.value);
+      if (!state.health.draft[cu.id]) {
+        state.health.draft[cu.id] = { engagement: 50, energy: 50, prioritisation: 50, ways: 50 };
+      }
+      state.health.draft[cu.id][key] = val;
+      // Live-update the big number for this dial without a full re-render
+      const card = el.closest('div[style*="border-radius:10px"]');
+      if (card) {
+        const numEl = card.querySelector('div[style*="font-size:28px"]');
+        // Only update the user's draft number when no team has submitted yet
+        if (numEl && Object.keys(state.health.submitted).length === 0) {
+          numEl.textContent = val;
+        }
+      }
+    };
+  });
+
+  const submitBtn = document.getElementById('submitHealth');
+  if (submitBtn && cu) {
+    submitBtn.onclick = () => {
+      const draft = state.health.draft[cu.id] || { engagement: 50, energy: 50, prioritisation: 50, ways: 50 };
+      state.health.submitted[cu.id] = { ...draft };
+      render();
+    };
+  }
+
+  const unsubmitBtn = document.getElementById('unsubmitHealth');
+  if (unsubmitBtn && cu) {
+    unsubmitBtn.onclick = () => {
+      delete state.health.submitted[cu.id];
+      render();
+    };
+  }
+
+  const scatter = document.getElementById('scatter');
+  if (scatter && cu) {
+    scatter.onclick = (e) => {
+      const rect = scatter.getBoundingClientRect();
+      const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+      const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+      const p = state.participants.find(x => x.id === cu.id);
+      if (p) {
+        p.pin = { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+        render();
+      }
+    };
+  }
+
+  document.querySelectorAll('[data-retro]').forEach(el => {
+    el.onkeydown = (e) => {
+      if (e.key === 'Enter' && cu) {
+        const text = e.target.value.trim();
+        if (!text) return;
+        const ck = el.dataset.retro;
+        state.retroCards[ck].push({ id: Date.now() + Math.random(), text, color: cu.color, reactions: { heart: [], like: [], q: [] } });
+        e.target.value = '';
+        render();
+      }
+    };
+  });
+
+  window.reactRetro = (ck, id, k) => {
+    const c = state.retroCards[ck].find(x => String(x.id) === String(id));
+    if (c) { toggleReaction(c.reactions, k); render(); }
+  };
+}
+
+function renderCommitments() {
+  const cu = currentUser();
+  const synthesisGoals = [
+    'Shift CX from project mode to an always-on capability',
+    'Make VMO the single front door for vendor engagement',
+    'Replace activity reporting with outcome-based scorecards',
+  ];
+  const synthesisActions = [
+    { tag: 'CX', text: 'Stand up a single CX scorecard by end of Q3', owner: 'Priya' },
+    { tag: 'CX', text: 'Kill duplicate status reporting — consolidate into one weekly', owner: 'Marcus' },
+    { tag: 'VMO', text: 'Roll out standardised vendor intake form across business units', owner: 'Sara' },
+    { tag: 'VMO', text: 'Automate SLA dashboard — retire manual invoice chasing', owner: 'Devon' },
+  ];
+
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+        ${eyebrow(COLORS[3].hex, 'COMMITMENTS GOING FORWARD')}
+        <h1 style="margin-bottom:32px">From discussion to decision</h1>
+
+        <div class="card" style="margin-bottom:40px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div>
+              <div style="font-weight:500;font-size:15px;color:${COLORS[1].hex}">✨ AI synthesis</div>
+              <div class="helper-text">Health check + retro board · just now</div>
+            </div>
+            <div style="padding:3px 10px;border-radius:999px;font-size:10px;background:${COLORS[4].tint};color:${COLORS[4].dark}">Auto-generated</div>
+          </div>
+
+          <div style="border-radius:12px;padding:16px;margin-bottom:12px;background:#FAFAF7">
+            <div style="font-size:11px;font-weight:500;margin-bottom:10px;color:#888;letter-spacing:1px">BIG-PICTURE GOALS</div>
+            ${synthesisGoals.map(g => `<div style="font-size:13px;display:flex;gap:8px;margin-bottom:6px"><span style="color:#aaa">•</span>${g}</div>`).join('')}
+          </div>
+
+          <div style="border-radius:12px;padding:16px;margin-bottom:12px;background:#FAFAF7">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:11px;font-weight:500;color:#888;letter-spacing:1px">ACTIONS IDENTIFIED</div>
+              <div style="font-size:10px;color:#aaa">${synthesisActions.length} items</div>
+            </div>
+            ${synthesisActions.map(a => `
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:white;font-size:13px">
+                <span style="font-size:10px;font-weight:500;padding:2px 8px;border-radius:6px;background:${a.tag === 'CX' ? COLORS[4].tint : COLORS[2].tint};color:${a.tag === 'CX' ? COLORS[4].dark : COLORS[2].dark}">${a.tag}</span>
+                <span style="flex:1">${a.text}</span>
+                <span style="font-size:11px;color:#888">${a.owner}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div style="border-radius:12px;padding:16px;background:${COLORS[3].tint}">
+            <div style="font-size:11px;font-weight:500;margin-bottom:6px;letter-spacing:1px;color:${COLORS[3].dark}">WHAT THE ROOM IS SAYING</div>
+            <div style="font-size:13px;line-height:1.6;color:${COLORS[3].dark}">
+              ${(() => {
+                const subIds = Object.keys(state.health.submitted);
+                if (subIds.length === 0) {
+                  return `No health check data yet — once the room submits their dials on page 2, the synthesis will summarize the team's pulse here. The retro signals appetite to <em>stop</em> overlapping reporting and <em>start</em> a single source of truth.`;
+                }
+                const avg = (k) => Math.round(subIds.reduce((s, id) => s + state.health.submitted[id][k], 0) / subIds.length);
+                const eng = avg('engagement'), ene = avg('energy'), pri = avg('prioritisation'), way = avg('ways');
+                const scores = [{ n: 'Engagement', v: eng }, { n: 'Energy', v: ene }, { n: 'Prioritisation', v: pri }, { n: 'Ways of working', v: way }];
+                const lowest = scores.reduce((m, x) => x.v < m.v ? x : m, scores[0]);
+                const others = scores.filter(x => x.n !== lowest.n);
+                return `${lowest.n} is the lowest dimension (${lowest.v}/100, n=${subIds.length}) — the team is committed but stretched. ${others.map(o => `${o.n} sits at ${o.v}`).join(', ')}. The retro signals appetite to <em>stop</em> overlapping reporting and <em>start</em> a single source of truth.`;
+              })()}
+            </div>
+          </div>
+        </div>
+
+        ${eyebrow(COLORS[0].hex, 'COMMITMENT WALL')}
+        <h2 style="margin-bottom:8px">What will you own?</h2>
+        <p class="helper-text" style="margin-bottom:20px">"Based on our discussion so far, I [name] commit to [what you can own and drive] by [date you're aiming for]."</p>
+
+        ${cu ? `
+          <div class="card" style="margin-bottom:24px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              ${badge(cu, 'lg')}
+              <div style="font-size:14px">I, <strong style="color:${cu.color.hex}">${escapeHtml(cu.name)}</strong>, commit to...</div>
+            </div>
+            <textarea id="commWhat" class="textarea" rows="2" placeholder="What you'll own and drive..." style="width:100%;margin-bottom:12px"></textarea>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="commBy" class="input" placeholder="By when? (e.g. end of Q3)" style="flex:1" />
+              <button class="pill-btn pill-primary" id="commBtn">Commit</button>
+            </div>
+          </div>
+        ` : '<div class="helper-text" style="margin-bottom:24px">Join from the welcome page to add a commitment.</div>'}
+
+        <div class="grid-2">
+          ${state.commitments.map(c => `
+            <div style="border-radius:16px;padding:16px;background:${c.color.tint}">
+              <div style="display:flex;gap:12px">
+                ${badge({ name: c.name, color: c.color }, 'lg')}
+                <div style="flex:1">
+                  <div style="font-size:13px;margin-bottom:4px;color:${c.color.dark}"><strong>${escapeHtml(c.name)}</strong> commits to:</div>
+                  <div style="font-size:14px;font-weight:500;margin-bottom:4px;color:${c.color.dark}">${escapeHtml(c.what)}</div>
+                  <div style="font-size:11px;opacity:0.7;color:${c.color.dark}">by ${escapeHtml(c.by)}</div>
+                  ${reactionBar(c.reactions, 'reactComm', c.id)}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function attachCommitments() {
+  const cu = currentUser();
+  const commBtn = document.getElementById('commBtn');
+  if (commBtn && cu) {
+    commBtn.onclick = () => {
+      const what = document.getElementById('commWhat').value.trim();
+      const by = document.getElementById('commBy').value.trim() || 'end of 2026';
+      if (!what) return;
+      state.commitments.push({ id: Date.now() + Math.random(), what, by, name: cu.name, color: cu.color, reactions: { heart: [], like: [], q: [] } });
+      render();
+    };
+  }
+  window.reactComm = (id, k) => {
+    const c = state.commitments.find(x => String(x.id) === String(id));
+    if (c) { toggleReaction(c.reactions, k); render(); }
+  };
+}
+
+function renderBAU() {
+  const cu = currentUser();
+  const cols = [
+    { key: 'must', label: 'MUST BE TRUE', dot: '#3B6D11', bg: '#EAF3DE' },
+    { key: 'nice', label: 'NICE TO HAVE', dot: '#C97A0E', bg: '#FDF1DE' },
+    { key: 'risk', label: 'NOT YET · RISK', dot: '#A32D2D', bg: '#FCEBEB' },
+  ];
+
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+        <div class="eyebrow" style="color:${COLORS[2].hex}">LOOKING AHEAD · 1 OF 3</div>
+        <h1 style="margin-bottom:2px">Transition to BAU</h1>
+        <p style="font-size:12px;color:#aaa;margin-bottom:28px">~ 40 min</p>
+
+        <div class="card" style="border-left:4px solid ${COLORS[4].hex};border-radius:0 16px 16px 0;margin-bottom:24px">
+          <div class="eyebrow" style="color:${COLORS[4].hex}">THE QUESTION FOR THE ROOM</div>
+          <h2 style="line-height:1.2">What does it look like when a workstream has truly achieved its goals — and is ready for BAU?</h2>
+        </div>
+
+        <div style="border-radius:16px;padding:20px;margin-bottom:28px;background:#FAFAF7">
+          <div style="font-size:10px;font-weight:500;margin-bottom:12px;color:#888;letter-spacing:1px">IF THE ROOM GETS QUIET, PULL ON ONE OF THESE</div>
+          <ul style="list-style:none;font-size:13px;color:#444;line-height:1.8">
+            <li>• What needs to be true for a workstream to go to BAU?</li>
+            <li>• How does governance change — and how does it interact with CXT?</li>
+            <li>• What do we risk by transitioning <em>too early</em>? Too late?</li>
+          </ul>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.05);font-size:12px;color:#666">⚓ Anchor in <strong>Global Capabilities → CXO</strong> as the worked example.</div>
+        </div>
+
+        ${eyebrow(COLORS[2].hex, 'SORT THE CRITERIA')}
+        <h3 style="margin-bottom:6px">Drag each criterion to the right column</h3>
+        <p class="helper-text" style="margin-bottom:16px">Drag the pills from the tray below into a column. Click any sorted item to send it back to the tray. Hover and click × to remove a criterion.</p>
+
+        <div class="grid-3" style="margin-bottom:16px">
+          ${cols.map(c => `
+            <div class="drag-zone" data-col="${c.key}" style="background:${c.bg}">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <div style="width:6px;height:6px;border-radius:50%;background:${c.dot}"></div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:1px;color:${c.dot}">${c.label}</div>
+              </div>
+              <div>
+                ${state.bauCriteria[c.key].map(item => `
+                  <div class="drag-item drag-item-row" draggable="true" data-item="${escapeHtml(item)}" data-from="${c.key}">
+                    <span class="drag-item-text">${escapeHtml(item)}</span>
+                    <button class="drag-item-delete" data-delete-item="${escapeHtml(item)}" data-delete-from="${c.key}" title="Remove criterion" aria-label="Remove criterion">×</button>
+                  </div>
+                `).join('')}
+                ${state.bauCriteria[c.key].length === 0 ? '<div class="drop-here-msg">Drop here</div>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="drag-zone" data-col="tray" style="background:#FAFAF7">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:10px;font-weight:500;color:#888;letter-spacing:1px">CRITERIA TRAY · DRAG TO A COLUMN</div>
+            <div style="font-size:11px;color:#aaa">${state.bauCriteria.tray.length} in tray</div>
+          </div>
+          <div style="margin-bottom:10px">
+            ${state.bauCriteria.tray.map(item => `
+              <div class="drag-item tray drag-item-row" draggable="true" data-item="${escapeHtml(item)}" data-from="tray">
+                <span class="drag-item-text">${escapeHtml(item)}</span>
+                <button class="drag-item-delete" data-delete-item="${escapeHtml(item)}" data-delete-from="tray" title="Remove criterion" aria-label="Remove criterion">×</button>
+              </div>
+            `).join('')}
+            ${state.bauCriteria.tray.length === 0 ? '<div class="empty-state" style="display:inline-block">Tray empty — all criteria sorted.</div>' : ''}
+          </div>
+          <div style="display:flex;gap:8px;padding-top:10px;border-top:0.5px solid rgba(0,0,0,0.08)">
+            <input type="text" id="bauNewCriterion" class="input-small" placeholder="+ add a new criterion..." style="flex:1" />
+            <button class="pill-btn pill-secondary" id="bauAddCriterionBtn" style="padding:6px 14px;font-size:11px">Add</button>
+          </div>
+        </div>
+
+        ${notesSection('bauNotes', 'submitBauNote', 'What did the room land on? Decisions, tensions, follow-ups...')}
+      </div>
+    </div>
+  `;
+}
+
+function attachBAU() {
+  attachNotesSection('bauNotes', 'submitBauNote');
+
+  let draggedItem = null;
+  let draggedFrom = null;
+
+  document.querySelectorAll('.drag-item').forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      draggedItem = el.dataset.item;
+      draggedFrom = el.dataset.from;
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.onclick = (e) => {
+      if (e.target.classList.contains('drag-item-delete')) return;
+      if (el.dataset.from !== 'tray') {
+        const from = el.dataset.from;
+        const item = el.dataset.item;
+        state.bauCriteria[from] = state.bauCriteria[from].filter(x => x !== item);
+        if (!state.bauCriteria.tray.includes(item)) state.bauCriteria.tray.push(item);
+        render();
+      }
+    };
+  });
+
+  document.querySelectorAll('.drag-item-delete').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const item = btn.dataset.deleteItem;
+      const from = btn.dataset.deleteFrom;
+      state.bauCriteria[from] = state.bauCriteria[from].filter(x => x !== item);
+      render();
+    };
+  });
+
+  const addBtn = document.getElementById('bauAddCriterionBtn');
+  const addInput = document.getElementById('bauNewCriterion');
+  if (addBtn && addInput) {
+    const add = () => {
+      const text = addInput.value.trim();
+      if (!text) return;
+      const allItems = [
+        ...state.bauCriteria.must,
+        ...state.bauCriteria.nice,
+        ...state.bauCriteria.risk,
+        ...state.bauCriteria.tray,
+      ];
+      if (allItems.includes(text)) {
+        addInput.value = '';
+        return;
+      }
+      state.bauCriteria.tray.push(text);
+      addInput.value = '';
+      render();
+    };
+    addBtn.onclick = add;
+    addInput.onkeydown = (e) => { if (e.key === 'Enter') add(); };
+  }
+
+  document.querySelectorAll('.drag-zone').forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (!draggedItem) return;
+      const to = zone.dataset.col;
+      if (to === draggedFrom) return;
+      state.bauCriteria[draggedFrom] = state.bauCriteria[draggedFrom].filter(x => x !== draggedItem);
+      if (!state.bauCriteria[to].includes(draggedItem)) state.bauCriteria[to].push(draggedItem);
+      draggedItem = null;
+      draggedFrom = null;
+      render();
+    });
+  });
+
+  document.querySelectorAll('.drag-item').forEach(el => {
+    el.style.cursor = el.dataset.from === 'tray' ? 'grab' : 'pointer';
+    el.title = el.dataset.from === 'tray' ? 'Drag to a column' : 'Click to send back to tray, or drag';
+  });
+}
+
+function renderOrgEvolution() {
+  const cu = currentUser();
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+        <div class="eyebrow" style="color:${COLORS[2].hex}">LOOKING AHEAD · 2 OF 3</div>
+        <h1 style="margin-bottom:2px">CX org evolution</h1>
+        <p style="font-size:12px;color:#aaa;margin-bottom:28px">~ 15 min</p>
+
+        <div class="card" style="border-left:4px solid ${COLORS[4].hex};border-radius:0 16px 16px 0;margin-bottom:24px">
+          <div class="eyebrow" style="color:${COLORS[4].hex}">THE QUESTION</div>
+          <h2 style="line-height:1.2">Are we heading in the right direction — and at the right pace — toward the future org?</h2>
+        </div>
+
+        <div style="border-radius:16px;padding:20px;margin-bottom:24px;background:#FAFAF7">
+          <div style="font-size:10px;font-weight:500;margin-bottom:12px;color:#888;letter-spacing:1px">IF THE ROOM GETS QUIET, PULL ON ONE OF THESE</div>
+          <ul style="list-style:none;font-size:13px;color:#444;line-height:1.8">
+            <li>• July will be messy by design, but what needs to be stable by October?</li>
+            <li>• What proof points will tell us we've landed it?</li>
+            <li>• What is the VMO's role in this?</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+            <div style="font-weight:500;font-size:15px;color:${COLORS[1].hex}">July → beyond runway</div>
+            <div style="font-size:11px;color:#aaa">Drag pins from below onto a month</div>
+          </div>
+          <p class="helper-text" style="margin-bottom:20px">July is messy by design. What needs to be <em>stable</em> by October — and what comes after?</p>
+
+          <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;position:relative">
+            <div style="position:absolute;top:11px;left:8%;right:8%;height:2px;background:rgba(0,0,0,0.08);z-index:0"></div>
+            ${[
+              { m: 'July',              sub: 'Messy by design',  color: COLORS[3].hex, filled: true,  key: 'jul' },
+              { m: 'August',            sub: '',                  color: '#999',         filled: false, key: 'aug' },
+              { m: 'September',         sub: '',                  color: '#999',         filled: false, key: 'sep' },
+              { m: 'October',           sub: 'Must be stable',   color: COLORS[1].hex, filled: true,  key: 'oct' },
+              { m: 'November & beyond', sub: 'The horizon',      color: COLORS[4].hex, filled: true,  key: 'nov' },
+            ].map(d => {
+              const monthPins = state.orgPins.filter(p => p.month === d.key);
+              return `
+                <div style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:1">
+                  <div class="timeline-dot ${d.filled ? 'filled' : ''}" style="background:${d.filled ? d.color : 'white'};margin-bottom:8px"></div>
+                  <div style="font-size:13px;font-weight:500;color:${d.color};text-align:center;line-height:1.2">${d.m}</div>
+                  <div style="font-size:10px;color:#aaa;margin-bottom:10px">${d.sub || '\u00A0'}</div>
+                  <div class="month-dropzone" data-month="${d.key}" style="width:100%;min-height:90px;border-radius:10px;background:#FAFAF7;border:1px dashed rgba(0,0,0,0.1);padding:8px;transition:background 0.15s,border-color 0.15s">
+                    ${monthPins.length === 0 ? `<div style="font-size:10px;color:#bbb;text-align:center;padding:14px 4px;font-style:italic">drop pin here</div>` : monthPins.map(p => `
+                      <div class="month-pin pin-card" draggable="true" data-pin-id="${JSON.stringify(p.id).replace(/"/g, '&quot;')}" style="background:${p.color.tint};border-left:3px solid ${p.color.hex};padding:6px 8px;border-radius:6px;margin-bottom:4px;cursor:grab;font-size:11px;line-height:1.3;color:${p.color.dark}" title="${escapeHtml(p.name)}: ${escapeHtml(p.text)}">${escapeHtml(p.text.length > 60 ? p.text.slice(0, 58) + '…' : p.text)}</div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="card month-dropzone" data-month="" style="margin-bottom:12px">
+          <div class="eyebrow" style="color:${COLORS[4].hex}">PIN WHAT MUST BE STABLE BY OCTOBER</div>
+          <p class="helper-text" style="margin:8px 0 12px">Unassigned pins live here. Drag onto a month above to anchor it.</p>
+          <div style="margin:16px 0">
+            ${(() => {
+              const unassigned = state.orgPins.filter(p => !p.month);
+              if (unassigned.length === 0) return `<div class="empty-state">${state.orgPins.length === 0 ? 'Nothing pinned yet — be the first.' : 'All pins assigned to a month. Drag one back here to unassign.'}</div>`;
+              return unassigned.map(p => `
+                <div class="pin-card" draggable="true" data-pin-id="${JSON.stringify(p.id).replace(/"/g, '&quot;')}" style="display:flex;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;background:${p.color.tint};cursor:grab" title="Drag onto a month">
+                  ${badge({ name: p.name, color: p.color })}
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:11px;font-weight:500;margin-bottom:2px;color:${p.color.dark}">${escapeHtml(p.name)}</div>
+                    <div style="font-size:14px;color:${p.color.dark}">${escapeHtml(p.text)}</div>
+                    ${reactionBar(p.reactions, 'reactPin', p.id)}
+                  </div>
+                </div>
+              `).join('');
+            })()}
+          </div>
+          ${cu ? `
+            <div style="display:flex;gap:8px">
+              <input type="text" id="pinInput" class="input" placeholder="Share what must be stable..." style="flex:1" />
+              <button class="pill-btn pill-primary" id="pinBtn">Share</button>
+            </div>
+          ` : `<div class="helper-text">Join from the welcome page to share.</div>`}
+        </div>
+
+        ${notesSection('orgNotes', 'submitOrgNote', 'Decisions, open questions, what needs to be true...')}
+      </div>
+    </div>
+  `;
+}
+
+function attachOrgEvolution() {
+  const cu = currentUser();
+  const pinBtn = document.getElementById('pinBtn');
+  const pinInput = document.getElementById('pinInput');
+  if (pinBtn && cu) {
+    const addPin = () => {
+      const text = pinInput.value.trim();
+      if (!text) return;
+      state.orgPins.push({ id: Date.now() + Math.random(), text, name: cu.name, color: cu.color, reactions: { heart: [], like: [], q: [] } });
+      pinInput.value = '';
+      render();
+    };
+    pinBtn.onclick = addPin;
+    pinInput.onkeydown = (e) => { if (e.key === 'Enter') addPin(); };
+  }
+
+  attachNotesSection('orgNotes', 'submitOrgNote');
+
+  window.reactPin = (id, k) => {
+    const p = state.orgPins.find(x => String(x.id) === String(id));
+    if (p) { toggleReaction(p.reactions, k); render(); }
+  };
+
+  let draggedPinId = null;
+
+  document.querySelectorAll('.pin-card').forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      draggedPinId = el.dataset.pinId;
+      e.dataTransfer.effectAllowed = 'move';
+      try { e.dataTransfer.setData('text/plain', String(draggedPinId)); } catch (err) {}
+      el.style.opacity = '0.5';
+    });
+    el.addEventListener('dragend', () => {
+      el.style.opacity = '';
+      draggedPinId = null;
+    });
+  });
+
+  document.querySelectorAll('.month-dropzone').forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (zone.dataset.month) {
+        zone.style.background = 'rgba(123, 91, 168, 0.08)';
+        zone.style.borderColor = 'rgba(123, 91, 168, 0.4)';
+      }
+    });
+    zone.addEventListener('dragleave', () => {
+      if (zone.dataset.month) {
+        zone.style.background = '';
+        zone.style.borderColor = '';
+      }
+    });
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (zone.dataset.month) {
+        zone.style.background = '';
+        zone.style.borderColor = '';
+      }
+      const pinId = draggedPinId || e.dataTransfer.getData('text/plain');
+      if (!pinId) return;
+      const p = state.orgPins.find(x => String(x.id) === String(pinId));
+      if (!p) return;
+      const newMonth = zone.dataset.month || undefined;
+      if (p.month === newMonth) return;
+      p.month = newMonth;
+      draggedPinId = null;
+      render();
+    });
+  });
+}
+
+function renderBoldToBolder() {
+  const cu = currentUser();
+  const signals = [
+    { id: 's1', label: 'We are moving in the right direction' },
+    { id: 's2', label: 'We know what signals indicate readiness to move from bold to bolder' },
+    { id: 's3', label: "We're aware of and actively working towards cutting-edge innovation in the industry" },
+  ];
+
+  const colorMap = { green: '#3B6D11', amber: '#C97A0E', red: '#A32D2D' };
+  const bgMap = { green: '#EAF3DE', amber: '#FDF1DE', red: '#FCEBEB' };
+
+  return `
+    <div class="page">
+      ${shapesBg('sparse')}
+      <div class="content">
+        <div class="eyebrow" style="color:${COLORS[2].hex}">LOOKING AHEAD · 3 OF 3</div>
+        <h1 style="margin-bottom:2px">From bold to bolder</h1>
+        <p style="font-size:12px;color:#aaa;margin-bottom:28px">~ 20 min</p>
+
+        <div class="card" style="border-left:4px solid ${COLORS[3].hex};border-radius:0 16px 16px 0;margin-bottom:24px">
+          <div class="eyebrow" style="color:${COLORS[3].hex}">THE QUESTION</div>
+          <h2 style="line-height:1.2">How do we keep an eye on the future while we're executing Bold today?</h2>
+        </div>
+
+        <div style="border-radius:16px;padding:20px;margin-bottom:24px;background:#FAFAF7">
+          <div style="font-size:10px;font-weight:500;margin-bottom:12px;color:#888;letter-spacing:1px">IF THE ROOM GETS QUIET, PULL ON ONE OF THESE</div>
+          <ul style="list-style:none;font-size:13px;color:#444;line-height:1.8">
+            <li>• Are we aligned on our direction of travel? What does success look like for this program in 18 months?</li>
+            <li>• How do we avoid being stuck in foundational work forever?</li>
+            <li>• What signals or triggers indicate readiness to move to Bolder? Are there workstreams already operating at Bolder?</li>
+            <li>• What else is happening in the industry that we should be focusing on?</li>
+            <li>• What role should the VMO play?</li>
+          </ul>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:28px">
+          ${[
+            { label: 'BOLD', sub: 'Where we are', color: '#3B6D11', bg: '#EAF3DE' },
+            { label: 'BOLDER', sub: "What we're testing for", color: '#C97A0E', bg: '#FDF1DE' },
+            { label: 'BOLDEST', sub: 'The horizon', color: '#888', bg: 'transparent', dashed: true },
+          ].map(b => `
+            <div style="border-radius:16px;text-align:center;padding:20px;background:${b.bg};${b.dashed ? 'border:1.5px dashed #ccc' : ''}">
+              <div style="font-size:13px;font-weight:500;letter-spacing:1px;color:${b.color}">${b.label}</div>
+              <div style="font-size:11px;margin-top:4px;color:${b.color};opacity:0.8">${b.sub}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        ${eyebrow(COLORS[0].hex, 'ASSESS OUR CURRENT STATE')}
+        <p class="helper-text" style="margin-bottom:16px">Where are we, honestly? The pattern of reds and greens <em>is</em> the answer.</p>
+
+        <div style="margin-bottom:28px">
+          ${signals.map(s => {
+            const current = state.readiness[s.id];
+            return `
+              <div class="signal-row">
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:${COLORS[1].hex}">${s.label}</div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  ${['green', 'amber', 'red'].map(c => {
+                    const active = current === c;
+                    return `<button class="light" data-signal="${s.id}" data-light="${c}" style="background:${active ? colorMap[c] : bgMap[c]};${active ? `border:2px solid ${colorMap[c]}` : 'border:none'};opacity:${!current || active ? 1 : 0.3}"></button>`;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+          <div class="eyebrow" style="color:${COLORS[4].hex}">OPEN QUESTION</div>
+          <h3 style="margin-bottom:6px">What signals or triggers indicate readiness to move to Bolder?</h3>
+          <p class="helper-text" style="margin-bottom:16px">Drop in ideas. Tap red, amber, or green to indicate confidence — your tap shows in your color.</p>
+
+          <div style="margin-bottom:16px">
+            ${state.bolderTriggers && state.bolderTriggers.length > 0 ? state.bolderTriggers.map(t => `
+              <div style="display:flex;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;background:${t.color.tint}">
+                ${badge({ name: t.name, color: t.color })}
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:11px;font-weight:500;margin-bottom:2px;color:${t.color.dark}">${escapeHtml(t.name)}</div>
+                  <div style="font-size:14px;color:${t.color.dark};margin-bottom:8px">${escapeHtml(t.text)}</div>
+                  ${triggerRagBar(t)}
+                </div>
+              </div>
+            `).join('') : `<div class="empty-state">No triggers yet — drop the first one in.</div>`}
+          </div>
+
+          ${cu ? `
+            <div style="display:flex;gap:8px">
+              <input type="text" id="triggerInput" class="input" placeholder="What signal or trigger comes to mind?" style="flex:1" />
+              <button class="pill-btn pill-primary" id="triggerBtn">Submit</button>
+            </div>
+          ` : `<div class="helper-text">Join from the welcome page to share.</div>`}
+        </div>
+
+        ${notesSection('bolderNotes', 'submitBolderNote', 'Two flips that move us to Bolder, or notes from the conversation...')}
+      </div>
+    </div>
+  `;
+}
+
+function attachBoldToBolder() {
+  document.querySelectorAll('[data-signal]').forEach(el => {
+    el.onclick = () => {
+      const sid = el.dataset.signal;
+      const light = el.dataset.light;
+      state.readiness[sid] = state.readiness[sid] === light ? null : light;
+      render();
+    };
+  });
+  attachNotesSection('bolderNotes', 'submitBolderNote');
+
+  const cu = currentUser();
+  const triggerBtn = document.getElementById('triggerBtn');
+  const triggerInput = document.getElementById('triggerInput');
+  if (triggerBtn && triggerInput && cu) {
+    const submit = () => {
+      const text = triggerInput.value.trim();
+      if (!text) return;
+      state.bolderTriggers.push({
+        id: Date.now() + Math.random(),
+        text,
+        name: cu.name,
+        color: cu.color,
+        ratings: {},
+      });
+      triggerInput.value = '';
+      render();
+    };
+    triggerBtn.onclick = submit;
+    triggerInput.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
+  }
+
+  window.rateTrigger = (id, rag) => {
+    const cu2 = currentUser();
+    if (!cu2) return;
+    const t = state.bolderTriggers.find(x => String(x.id) === String(id));
+    if (!t) return;
+    if (!t.ratings) t.ratings = {};
+    if (t.ratings[cu2.id] === rag) delete t.ratings[cu2.id];
+    else t.ratings[cu2.id] = rag;
+    render();
+  };
+}
+
+function renderClose() {
+  const cu = currentUser();
+  const decisions = [
+    'Single CX scorecard stood up by Q3 (Priya)',
+    'Reporting consolidated to one weekly source of truth (Marcus)',
+    'Standardised vendor intake form rolled out across BUs (Sara)',
+    'VMO named as single front door for vendor engagement',
+  ];
+  const nextSteps = [
+    `${state.commitments.length} commitments made in the room — all logged with owners and dates`,
+    'Reconvene in 6 weeks to review BAU transition criteria sorted today',
+    'Jonathan to confirm appetite for Bolder by next monthly',
+    'CX org chart drafted by August, finalised by October',
+  ];
+
+  return `
+    <div class="page">
+      ${shapesBg('full')}
+      <div class="content">
+        <div class="banner" style="background:${COLORS[1].hex};color:white;padding:48px 24px">
+          <div class="shape circle" style="position:absolute;top:16px;right:48px;width:56px;height:56px;background:${COLORS[0].hex}"></div>
+          <div class="shape circle" style="position:absolute;bottom:16px;left:64px;width:40px;height:40px;background:${COLORS[3].hex}"></div>
+          <div class="shape square" style="position:absolute;top:48px;left:96px;width:24px;height:24px;background:${COLORS[4].hex};transform:rotate(20deg)"></div>
+          <h1 class="banner">Thank you for driving the CX transformation!</h1>
+          <p style="font-size:15px;opacity:0.8;margin-top:8px;position:relative">${state.participants.length} people · ${state.commitments.length} commitments · 1 great conversation</p>
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div>
+              <div style="font-weight:500;font-size:15px;color:${COLORS[1].hex}">✨ AI summary · Decisions & next steps</div>
+              <div class="helper-text">Pulled from all sections</div>
+            </div>
+            <div style="padding:3px 10px;border-radius:999px;font-size:10px;background:${COLORS[4].tint};color:${COLORS[4].dark}">Auto-generated</div>
+          </div>
+
+          <div class="grid-2">
+            <div style="border-radius:12px;padding:16px;background:${COLORS[2].tint}">
+              <div style="font-size:11px;font-weight:500;margin-bottom:12px;letter-spacing:1px;color:${COLORS[2].dark}">DECISIONS</div>
+              ${decisions.map(d => `<div style="font-size:13px;display:flex;gap:8px;margin-bottom:8px;color:${COLORS[2].dark}"><span>✓</span>${d}</div>`).join('')}
+            </div>
+            <div style="border-radius:12px;padding:16px;background:${COLORS[3].tint}">
+              <div style="font-size:11px;font-weight:500;margin-bottom:12px;letter-spacing:1px;color:${COLORS[3].dark}">NEXT STEPS</div>
+              ${nextSteps.map(d => `<div style="font-size:13px;display:flex;gap:8px;margin-bottom:8px;color:${COLORS[3].dark}"><span>→</span>${d}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        ${eyebrow(COLORS[0].hex, 'FINAL REFLECTIONS')}
+        <h3 style="margin-bottom:12px">One thing you're taking away</h3>
+        ${cu ? `
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <input type="text" id="refInput" class="input" placeholder="Your takeaway..." style="flex:1" />
+            <button class="pill-btn pill-primary" id="refBtn">Share</button>
+          </div>
+        ` : ''}
+        <div class="grid-2" style="margin-bottom:32px">
+          ${state.finalReflections.map(r => `
+            <div style="border-radius:16px;padding:12px;display:flex;gap:8px;background:${r.color.tint}">
+              ${badge({ name: r.name, color: r.color })}
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:500;margin-bottom:2px;color:${r.color.dark}">${escapeHtml(r.name)}</div>
+                <div style="font-size:13px;color:${r.color.dark}">${escapeHtml(r.text)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function attachClose() {
+  const cu = currentUser();
+  const refBtn = document.getElementById('refBtn');
+  const refInput = document.getElementById('refInput');
+  if (refBtn && cu) {
+    const add = () => {
+      const text = refInput.value.trim();
+      if (!text) return;
+      state.finalReflections.push({ id: Date.now() + Math.random(), text, name: cu.name, color: cu.color });
+      refInput.value = '';
+      render();
+    };
+    refBtn.onclick = add;
+    refInput.onkeydown = (e) => { if (e.key === 'Enter') add(); };
+  }
+}
+
+render();
+</script>
+</body>
+</html>
