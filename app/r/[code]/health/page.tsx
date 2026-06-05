@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Card } from "@/app/components/Card";
 import { Eyebrow } from "@/app/components/Eyebrow";
 import { PillButton } from "@/app/components/PillButton";
@@ -13,22 +13,7 @@ import { useReactions, type ReactionKind } from "@/hooks/useReactions";
 import { COLORS, colorForIdx, type ParticipantColor } from "@/lib/colors";
 import { getSupabase } from "@/lib/supabase";
 
-type DialKey = "engagement" | "energy" | "prioritisation" | "ways";
-type Dials = Record<DialKey, number>;
-const DEFAULT_DIALS: Dials = { engagement: 50, energy: 50, prioritisation: 50, ways: 50 };
 
-const DIMENSIONS: ReadonlyArray<{
-  key: DialKey;
-  label: string;
-  help: string;
-  left: string;
-  right: string;
-}> = [
-  { key: "engagement",     label: "Engagement",      help: "Are people leaning in?",       left: "Checked out", right: "All in"        },
-  { key: "energy",         label: "Energy",          help: "Momentum and morale",          left: "Drained",     right: "Buzzing"       },
-  { key: "prioritisation", label: "Prioritisation",  help: "Working on the right things?", left: "Scattered",   right: "Laser-focused" },
-  { key: "ways",           label: "Ways of working", help: "Rituals, decisions, flow",     left: "Friction",    right: "Smooth"        },
-];
 
 type RetroAction = "continue" | "stop" | "change";
 type RetroLane = "cx" | "vmo";
@@ -61,54 +46,13 @@ type RetroCard = {
 
 export default function HealthPage() {
   const { session, currentParticipant, participants } = useSession();
-  const { submissions, loaded: subsLoaded } = useHealthSubmissions(session?.id ?? null);
+  const { submissions } = useHealthSubmissions(session?.id ?? null);
   const { items: retroCards } = useEntries<RetroCard>("retro_cards", session?.id ?? null);
   const { reactions, toggleReaction } = useReactions(session?.id ?? null);
 
-  const mySubmission = currentParticipant ? submissions.get(currentParticipant.id) : undefined;
-  const hasSubmittedDials = !!(mySubmission && mySubmission.engagement != null);
 
-  // Component-local draft. Reference does the same — drafts are device-
-  // local until the participant explicitly submits.
-  const [draft, setDraft] = useState<Dials>(DEFAULT_DIALS);
-  const initRef = useRef(false);
 
-  // Initialize draft from the user's submitted row exactly once (covers
-  // refresh-after-submit). After that, the draft is owned by the
-  // component so Edit can preserve the user's last answer.
-  useEffect(() => {
-    if (initRef.current || !currentParticipant || !subsLoaded) return;
-    const my = submissions.get(currentParticipant.id);
-    if (my && my.engagement != null) {
-      setDraft({
-        engagement: my.engagement,
-        energy: my.energy ?? 50,
-        prioritisation: my.prioritisation ?? 50,
-        ways: my.ways ?? 50,
-      });
-    }
-    initRef.current = true;
-  }, [currentParticipant, submissions, subsLoaded]);
 
-  // Submitted rows are those with dials filled (engagement != null).
-  // A row can exist with only pin_x/pin_y set — that's a pin-only row,
-  // not a submission.
-  const submittedRows = useMemo(() => {
-    const out: HealthSubmission[] = [];
-    for (const row of submissions.values()) {
-      if (row.engagement != null) out.push(row);
-    }
-    return out;
-  }, [submissions]);
-
-  const teamAvg = (key: DialKey): number | null => {
-    if (submittedRows.length === 0) return null;
-    const sum = submittedRows.reduce(
-      (s, r) => s + (r[key] as number | null ?? 0),
-      0,
-    );
-    return Math.round(sum / submittedRows.length);
-  };
 
   const myColor: ParticipantColor | null = currentParticipant
     ? colorForIdx(currentParticipant.color_idx)
@@ -144,23 +88,6 @@ export default function HealthPage() {
     if (error) console.error("[health_submissions upsert]", error);
   };
 
-  const submitDials = () =>
-    writeRow({
-      engagement: draft.engagement,
-      energy: draft.energy,
-      prioritisation: draft.prioritisation,
-      ways: draft.ways,
-      submitted_at: new Date().toISOString(),
-    });
-
-  const unsubmitDials = () =>
-    writeRow({
-      engagement: null,
-      energy: null,
-      prioritisation: null,
-      ways: null,
-      submitted_at: null,
-    });
 
   const dropPin = (xPct: number, yPct: number) =>
     writeRow({ pin_x: xPct, pin_y: yPct });
@@ -197,131 +124,6 @@ export default function HealthPage() {
             <div className="text-[11px] px-3.5 py-1.5 rounded-full border-[0.5px] border-black/15 text-ink-mute text-center leading-[1.3]">
               Step 1 of<br />2
             </div>
-          </div>
-
-          <div className="font-medium text-sm text-ink mb-0.5">
-            How healthy does the program feel right now?
-          </div>
-          <div className="text-xs text-ink-faint mb-4">
-            Drag each dial. Gut answers only.
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-            {DIMENSIONS.map((dim) => {
-              const avg = teamAvg(dim.key);
-              const dotCount = submittedRows.length;
-              const totalParticipants = participants.length;
-              const sliderVal = hasSubmittedDials
-                ? (mySubmission?.[dim.key] as number) ?? 50
-                : draft[dim.key];
-              const displayNum = avg !== null ? avg : (currentParticipant ? draft[dim.key] : 50);
-
-              const dots = submittedRows.map((r) => {
-                const p = participantById(r.participant_id);
-                return {
-                  id: r.participant_id,
-                  color: colorForIdx(p?.color_idx ?? 0),
-                  name: p?.name ?? "Unknown",
-                  val: (r[dim.key] as number | null) ?? 0,
-                  isMe: currentParticipant?.id === r.participant_id,
-                };
-              });
-
-              return (
-                <div
-                  key={dim.key}
-                  className="rounded-[10px] px-4 py-3.5 border-[0.5px] border-black/[0.08] bg-white"
-                  style={hasSubmittedDials ? { opacity: 0.92 } : undefined}
-                >
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <div className="w-[13px] h-[13px] rounded-[3px] border-[1.5px] border-black/30" />
-                    <div className="font-medium text-[13px] text-ink">{dim.label}</div>
-                  </div>
-                  <div className="text-xs text-ink-faint mb-2 pl-[21px]">{dim.help}</div>
-                  <div className="flex items-baseline gap-2 mb-2.5">
-                    <div className="text-[28px] font-medium leading-none text-ink">
-                      {displayNum}
-                    </div>
-                    <div className="text-[10px] text-ink-ghost">
-                      {avg !== null
-                        ? `team avg · ${dotCount}/${totalParticipants}`
-                        : currentParticipant
-                          ? "your guess"
-                          : "—"}
-                    </div>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={sliderVal}
-                    onChange={(e) =>
-                      setDraft((prev) => ({ ...prev, [dim.key]: Number(e.target.value) }))
-                    }
-                    disabled={hasSubmittedDials || !currentParticipant}
-                    style={
-                      {
-                        ["--thumb-color" as string]: myColor?.hex ?? "#888",
-                        cursor: hasSubmittedDials ? "not-allowed" : undefined,
-                      } as React.CSSProperties
-                    }
-                  />
-                  {/* Submitted-value dot row. 12px dots with a whole-
-                      pixel 2px white border so participants viewing
-                      at non-100% zoom (89%, 110%, etc. on their own
-                      laptops / phones) don't see sub-pixel rounding
-                      make the dots look uneven. will-change:transform
-                      promotes each dot to its own compositor layer
-                      so anti-aliasing stays consistent regardless of
-                      what neighbouring elements are painting. */}
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: 16,
-                      marginTop: 10,
-                    }}
-                  >
-                    {dots.map((d) => (
-                      <div
-                        key={d.id}
-                        title={`${d.name}: ${d.val}`}
-                        style={{
-                          position: "absolute",
-                          display: "block",
-                          left: `${d.val}%`,
-                          top: "50%",
-                          width: 12,
-                          height: 12,
-                          minWidth: 12,
-                          minHeight: 12,
-                          maxWidth: 12,
-                          maxHeight: 12,
-                          aspectRatio: "1 / 1",
-                          padding: 0,
-                          margin: 0,
-                          borderRadius: "50%",
-                          background: d.color.hex,
-                          border: "2px solid #ffffff",
-                          boxSizing: "border-box",
-                          transform: "translate(-50%,-50%)",
-                          willChange: "transform",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-                          zIndex: d.isMe ? 2 : 1,
-                          flexShrink: 0,
-                          flexGrow: 0,
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between text-[10px] text-ink-ghost mt-0.5">
-                    <span>{dim.left}</span>
-                    <span>{dim.right}</span>
-                  </div>
-                </div>
-              );
-            })}
           </div>
 
           {/* --- Direction & pace pin scatter --- */}
@@ -462,51 +264,6 @@ export default function HealthPage() {
           </div>
 
           {/* --- Submit / Edit row --- */}
-          <div className="flex flex-wrap justify-between items-center pt-3.5 border-t-[0.5px] border-black/[0.08] gap-3">
-            <div className="flex items-center gap-2.5 text-[11px] text-ink-faint">
-              <span>
-                {submittedRows.length} of {participants.length} submitted
-              </span>
-              <div className="flex gap-1">
-                {participants.map((p) => {
-                  const sub = submissions.get(p.id);
-                  const submitted = !!(sub && sub.engagement != null);
-                  const c = colorForIdx(p.color_idx);
-                  return (
-                    <div
-                      key={p.id}
-                      title={`${p.name}${submitted ? " ✓" : " — pending"}`}
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{ background: c.hex, opacity: submitted ? 1 : 0.25 }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-            {currentParticipant ? (
-              hasSubmittedDials ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: "#0F6E56" }}>
-                    ✓ You&apos;ve submitted
-                  </span>
-                  <button
-                    onClick={unsubmitDials}
-                    className="px-3 py-1.5 rounded-full text-[11px] border border-black/15 text-ink-mute bg-transparent hover:bg-black/[0.03]"
-                  >
-                    Edit
-                  </button>
-                </div>
-              ) : (
-                <PillButton onClick={submitDials} color="#1a1a2e">
-                  Submit my answers →
-                </PillButton>
-              )
-            ) : (
-              <div className="text-xs text-ink-ghost">
-                Join from the welcome page to submit
-              </div>
-            )}
-          </div>
         </Card>
 
         {/* =========================== RETRO BOARD =========================== */}

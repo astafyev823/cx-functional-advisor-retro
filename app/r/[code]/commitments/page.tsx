@@ -100,9 +100,9 @@ export default function CommitmentsPage() {
         />
 
         <Eyebrow color={COLORS[0].hex}>COMMITMENT WALL</Eyebrow>
-        <h2 className="text-2xl font-medium text-navy mb-2">What do you want to help drive?</h2>
+        <h2 className="text-2xl font-medium text-navy mb-2">What will you champion?</h2>
         <p className="text-xs text-ink-faint mb-5">
-          &ldquo;Based on our discussion so far, I [name] want to help drive [what
+          &ldquo;Based on our discussion so far, I [name] will champion [what
           you&rsquo;ll push forward] by [date you&rsquo;re aiming for].&rdquo;
         </p>
 
@@ -119,14 +119,14 @@ export default function CommitmentsPage() {
                 <strong style={{ color: colorForIdx(currentParticipant.color_idx).hex }}>
                   {currentParticipant.name}
                 </strong>
-                , want to help drive...
+                , will champion...
               </div>
             </div>
             <textarea
               value={draftWhat}
               onChange={(e) => setDraftWhat(e.target.value)}
               rows={2}
-              placeholder="What you'll help drive..."
+              placeholder="What you'll champion..."
               className="w-full mb-3 px-4 py-2.5 rounded-2xl border border-black/10 bg-white text-sm outline-none focus:border-navy resize-y"
             />
             <div className="flex flex-wrap gap-2">
@@ -454,7 +454,7 @@ function CommitmentCard({
           {editing ? (
             <>
               <div className="text-[13px] mb-2" style={{ color: c.dark }}>
-                I, <strong>{author?.name ?? "?"}</strong>, want to help drive...
+                I, <strong>{author?.name ?? "?"}</strong>, will champion...
               </div>
               <textarea
                 value={draftWhat}
@@ -488,7 +488,7 @@ function CommitmentCard({
             <>
               <div className="flex items-start justify-between gap-2">
                 <div className="text-[13px]" style={{ color: c.dark }}>
-                  <strong>{author?.name ?? "Unknown"}</strong> wants to help drive:
+                  <strong>{author?.name ?? "Unknown"}</strong> will champion:
                 </div>
                 {isOwn ? (
                   <button
