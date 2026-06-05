@@ -136,8 +136,7 @@ export default function CelebratePage() {
         <Card className="mb-10">
           <Eyebrow color={COLORS[3].hex}>QUESTION FOR THE ROOM</Eyebrow>
           <h3 className="text-lg font-medium text-navy mb-4">
-            What are you most proud of from the last 7 months? What&apos;s a moment
-            that was meaningful to you?
+            How are you feeling about the CX Transformation work we&apos;ve done so far?
           </h3>
 
           {currentParticipant ? (
@@ -148,7 +147,7 @@ export default function CelebratePage() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") submitProud();
                 }}
-                placeholder="Share a moment..."
+                placeholder="Share how you're feeling..."
                 className="flex-1 px-4 py-2.5 rounded-full border border-black/10 bg-white text-sm outline-none focus:border-navy"
               />
               <PillButton onClick={submitProud} disabled={!proudDraft.trim() || submitting}>

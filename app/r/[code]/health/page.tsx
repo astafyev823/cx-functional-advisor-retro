@@ -35,7 +35,6 @@ type RetroLane = "cx" | "vmo";
 
 const LANES: ReadonlyArray<{ key: RetroLane; label: string; colorIdx: 0 | 1 | 2 | 3 | 4 }> = [
   { key: "cx",  label: "CX transformation", colorIdx: 4 },
-  { key: "vmo", label: "VMO",               colorIdx: 2 },
 ];
 
 const ACTIONS: ReadonlyArray<{
@@ -516,8 +515,8 @@ export default function HealthPage() {
           Continue / Stop / Change
         </h2>
         <p className="text-xs text-ink-faint mb-5">
-          Capture what&apos;s working, what to drop, and what to do differently —
-          for each lane.
+          Capture what&apos;s working, what to drop, and what to do differently
+          for the CX Transformation.
         </p>
 
         <Card>

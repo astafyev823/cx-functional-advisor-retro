@@ -740,7 +740,7 @@ export function SessionPdfDocument({
         {retroCards.length === 0 ? (
           <Text style={styles.emptyLine}>No data captured in this section.</Text>
         ) : (
-          (["cx", "vmo"] as const).map((lane) => {
+          (["cx"] as const).map((lane) => {
             const laneCards = retroCards.filter((c) => c.lane === lane);
             if (laneCards.length === 0) return null;
             return (

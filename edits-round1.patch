@@ -1,0 +1,464 @@
+diff --git a/app/components/BirthdayPresent.tsx b/app/components/BirthdayPresent.tsx
+deleted file mode 100644
+index 7e2aa28..0000000
+--- a/app/components/BirthdayPresent.tsx
++++ /dev/null
+@@ -1,226 +0,0 @@
+-"use client";
+-
+-import { AnimatePresence, motion } from "framer-motion";
+-import { useEffect, useMemo, useRef, useState } from "react";
+-import { COLORS } from "@/lib/colors";
+-
+-// Easter egg on the Welcome page. Local-only — clicking opens a birthday
+-// card modal for THIS browser only (no Supabase writes, no realtime).
+-
+-const CONFETTI_COLORS = [
+-  COLORS[0].hex, // magenta
+-  COLORS[1].hex, // navy
+-  COLORS[2].hex, // cobalt
+-  COLORS[3].hex, // amber
+-  COLORS[4].hex, // lavender
+-];
+-
+-const CONFETTI_COUNT = 50;
+-
+-type ConfettiPiece = {
+-  id: number;
+-  color: string;
+-  left: number;     // 0..100 (% across viewport)
+-  size: number;     // px square
+-  duration: number; // seconds for one fall
+-  delay: number;    // negative so pieces are mid-fall on mount
+-  drift: number;    // px horizontal sway
+-  rotation: number; // total degrees over one cycle
+-};
+-
+-function makeConfetti(): ConfettiPiece[] {
+-  // Math.random in render is fine — generated once per modal open and
+-  // never re-evaluated until the next open.
+-  return Array.from({ length: CONFETTI_COUNT }, (_, i) => ({
+-    id: i,
+-    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+-    left: Math.random() * 100,
+-    size: 8 + Math.random() * 5,
+-    duration: 3 + Math.random() * 3,
+-    // Negative delay = piece is already partway through its fall on
+-    // mount, so the field looks alive immediately instead of a clump
+-    // dropping from the top in unison.
+-    delay: -Math.random() * 5,
+-    drift: (Math.random() - 0.5) * 220,
+-    rotation: 180 + Math.random() * 540 * (Math.random() < 0.5 ? -1 : 1),
+-  }));
+-}
+-
+-export function BirthdayPresent() {
+-  const [open, setOpen] = useState(false);
+-  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+-
+-  // Fresh confetti seed each time the modal opens.
+-  const confetti = useMemo<ConfettiPiece[]>(
+-    () => (open ? makeConfetti() : []),
+-    [open],
+-  );
+-
+-  // Body scroll lock + ESC + focus trap while the modal is open.
+-  useEffect(() => {
+-    if (!open) return;
+-    const prev = document.body.style.overflow;
+-    document.body.style.overflow = "hidden";
+-    // Focus the close button so screen readers land somewhere sensible.
+-    closeBtnRef.current?.focus();
+-    const onKey = (e: KeyboardEvent) => {
+-      if (e.key === "Escape") {
+-        setOpen(false);
+-        return;
+-      }
+-      if (e.key === "Tab") {
+-        // The only focusable element inside the modal is the close
+-        // button, so Tab is a no-op — keep focus pinned.
+-        e.preventDefault();
+-        closeBtnRef.current?.focus();
+-      }
+-    };
+-    document.addEventListener("keydown", onKey);
+-    return () => {
+-      document.body.style.overflow = prev;
+-      document.removeEventListener("keydown", onKey);
+-    };
+-  }, [open]);
+-
+-  return (
+-    <>
+-      {/* The present icon. position:fixed, bottom-right, below the nav (z-40). */}
+-      <motion.button
+-        type="button"
+-        aria-label="Open birthday surprise"
+-        onClick={() => setOpen(true)}
+-        className="fixed bottom-6 right-6 z-30 leading-none select-none p-0"
+-        style={{
+-          fontSize: 48,
+-          background: "transparent",
+-          border: "none",
+-          cursor: "pointer",
+-          // Slight drop-shadow so the emoji reads against any background.
+-          filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
+-        }}
+-        whileHover={{
+-          y: [0, -12, 0],
+-          transition: {
+-            duration: 0.6,
+-            ease: "easeInOut",
+-            repeat: Infinity,
+-            repeatDelay: 0.1,
+-          },
+-        }}
+-      >
+-        🎁
+-      </motion.button>
+-
+-      <AnimatePresence>
+-        {open ? (
+-          <motion.div
+-            key="cx-birthday-backdrop"
+-            role="dialog"
+-            aria-modal="true"
+-            aria-label="Birthday surprise"
+-            className="fixed inset-0 z-50 flex items-center justify-center p-6"
+-            style={{ background: "rgba(0,0,0,0.5)" }}
+-            initial={{ opacity: 0 }}
+-            animate={{ opacity: 1 }}
+-            exit={{ opacity: 0 }}
+-            transition={{ duration: 0.2 }}
+-            onClick={() => setOpen(false)}
+-          >
+-            {/* Confetti layer — sits behind the card. pointer-events none
+-                so clicks fall through to the backdrop / card. */}
+-            <div
+-              aria-hidden="true"
+-              className="absolute inset-0 overflow-hidden pointer-events-none"
+-            >
+-              {confetti.map((p) => (
+-                <motion.div
+-                  key={p.id}
+-                  className="absolute rounded-sm"
+-                  style={{
+-                    left: `${p.left}%`,
+-                    top: -20,
+-                    width: p.size,
+-                    height: p.size,
+-                    background: p.color,
+-                  }}
+-                  animate={{
+-                    y: ["0vh", "110vh"],
+-                    x: [0, p.drift],
+-                    rotate: [0, p.rotation],
+-                  }}
+-                  transition={{
+-                    duration: p.duration,
+-                    delay: p.delay,
+-                    repeat: Infinity,
+-                    ease: "linear",
+-                  }}
+-                />
+-              ))}
+-            </div>
+-
+-            {/* The card itself. Stops click propagation so clicks on the
+-                card don't dismiss it. */}
+-            <motion.div
+-              className="relative rounded-3xl shadow-2xl"
+-              style={{
+-                width: "100%",
+-                maxWidth: 420,
+-                padding: 48,
+-                background: `linear-gradient(135deg, ${COLORS[0].tint} 0%, ${COLORS[2].tint} 50%, ${COLORS[4].tint} 100%)`,
+-              }}
+-              initial={{ opacity: 0, scale: 0.85 }}
+-              animate={{ opacity: 1, scale: 1 }}
+-              exit={{ opacity: 0, scale: 0.85 }}
+-              transition={{ duration: 0.25, ease: "easeOut" }}
+-              onClick={(e) => e.stopPropagation()}
+-            >
+-              <button
+-                ref={closeBtnRef}
+-                type="button"
+-                aria-label="Close birthday card"
+-                onClick={() => setOpen(false)}
+-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/70 hover:bg-white border-none flex items-center justify-center transition"
+-                style={{
+-                  fontSize: 20,
+-                  lineHeight: 1,
+-                  color: COLORS[1].hex,
+-                  cursor: "pointer",
+-                }}
+-              >
+-                ×
+-              </button>
+-
+-              <div className="text-center">
+-                <div style={{ fontSize: 40, lineHeight: 1 }} className="mb-4">
+-                  <span aria-hidden="true">🎉 🎂 🎈</span>
+-                </div>
+-                <div
+-                  className="font-medium leading-tight"
+-                  style={{ fontSize: 36, color: COLORS[1].hex }}
+-                >
+-                  Happy Birthday Jonathan!
+-                </div>
+-                <div
+-                  className="italic mt-3"
+-                  style={{
+-                    fontSize: 14,
+-                    color: COLORS[1].hex,
+-                    opacity: 0.7,
+-                  }}
+-                >
+-                  — from the VMO
+-                </div>
+-                <div
+-                  style={{ fontSize: 40, lineHeight: 1 }}
+-                  className="mt-5"
+-                >
+-                  <span aria-hidden="true">🎁 ✨ 🥳</span>
+-                </div>
+-              </div>
+-            </motion.div>
+-          </motion.div>
+-        ) : null}
+-      </AnimatePresence>
+-    </>
+-  );
+-}
+diff --git a/app/components/PdfExport.tsx b/app/components/PdfExport.tsx
+index a336c3f..4514623 100644
+--- a/app/components/PdfExport.tsx
++++ b/app/components/PdfExport.tsx
+@@ -740,7 +740,7 @@ export function SessionPdfDocument({
+         {retroCards.length === 0 ? (
+           <Text style={styles.emptyLine}>No data captured in this section.</Text>
+         ) : (
+-          (["cx", "vmo"] as const).map((lane) => {
++          (["cx"] as const).map((lane) => {
+             const laneCards = retroCards.filter((c) => c.lane === lane);
+             if (laneCards.length === 0) return null;
+             return (
+diff --git a/app/r/[code]/celebrate/page.tsx b/app/r/[code]/celebrate/page.tsx
+index 763ab55..a02cecb 100644
+--- a/app/r/[code]/celebrate/page.tsx
++++ b/app/r/[code]/celebrate/page.tsx
+@@ -136,8 +136,7 @@ export default function CelebratePage() {
+         <Card className="mb-10">
+           <Eyebrow color={COLORS[3].hex}>QUESTION FOR THE ROOM</Eyebrow>
+           <h3 className="text-lg font-medium text-navy mb-4">
+-            What are you most proud of from the last 7 months? What&apos;s a moment
+-            that was meaningful to you?
++            How are you feeling about the CX Transformation work we&apos;ve done so far?
+           </h3>
+ 
+           {currentParticipant ? (
+@@ -148,7 +147,7 @@ export default function CelebratePage() {
+                 onKeyDown={(e) => {
+                   if (e.key === "Enter") submitProud();
+                 }}
+-                placeholder="Share a moment..."
++                placeholder="Share how you're feeling..."
+                 className="flex-1 px-4 py-2.5 rounded-full border border-black/10 bg-white text-sm outline-none focus:border-navy"
+               />
+               <PillButton onClick={submitProud} disabled={!proudDraft.trim() || submitting}>
+diff --git a/app/r/[code]/commitments/page.tsx b/app/r/[code]/commitments/page.tsx
+index 95303ae..6730d1c 100644
+--- a/app/r/[code]/commitments/page.tsx
++++ b/app/r/[code]/commitments/page.tsx
+@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
+ import { Card } from "@/app/components/Card";
+ import { Eyebrow } from "@/app/components/Eyebrow";
+ import { ParticipantBadge } from "@/app/components/ParticipantBadge";
+-import { PauseCard } from "@/app/components/PauseCard";
+ import { PillButton } from "@/app/components/PillButton";
+ import { ReactionBar } from "@/app/components/ReactionBar";
+ import { ShapesBg } from "@/app/components/ShapesBg";
+@@ -101,10 +100,10 @@ export default function CommitmentsPage() {
+         />
+ 
+         <Eyebrow color={COLORS[0].hex}>COMMITMENT WALL</Eyebrow>
+-        <h2 className="text-2xl font-medium text-navy mb-2">What will you own?</h2>
++        <h2 className="text-2xl font-medium text-navy mb-2">What do you want to help drive?</h2>
+         <p className="text-xs text-ink-faint mb-5">
+-          &ldquo;Based on our discussion so far, I [name] commit to [what you can
+-          own and drive] by [date you&rsquo;re aiming for].&rdquo;
++          &ldquo;Based on our discussion so far, I [name] want to help drive [what
++          you&rsquo;ll push forward] by [date you&rsquo;re aiming for].&rdquo;
+         </p>
+ 
+         {currentParticipant ? (
+@@ -120,14 +119,14 @@ export default function CommitmentsPage() {
+                 <strong style={{ color: colorForIdx(currentParticipant.color_idx).hex }}>
+                   {currentParticipant.name}
+                 </strong>
+-                , commit to...
++                , want to help drive...
+               </div>
+             </div>
+             <textarea
+               value={draftWhat}
+               onChange={(e) => setDraftWhat(e.target.value)}
+               rows={2}
+-              placeholder="What you'll own and drive..."
++              placeholder="What you'll help drive..."
+               className="w-full mb-3 px-4 py-2.5 rounded-2xl border border-black/10 bg-white text-sm outline-none focus:border-navy resize-y"
+             />
+             <div className="flex flex-wrap gap-2">
+@@ -172,15 +171,6 @@ export default function CommitmentsPage() {
+             />
+           ))}
+         </div>
+-
+-        <PauseCard
+-          emoji="🥘"
+-          title="Mid-session potluck"
+-          body="If we had a CXT potluck tomorrow, what dish are you bringing? Be specific — and tell us why."
+-          footer="Take 5 minutes. Go round."
+-          bgColor={COLORS[2].tint}
+-          textColor={COLORS[2].dark}
+-        />
+       </div>
+     </main>
+   );
+@@ -464,7 +454,7 @@ function CommitmentCard({
+           {editing ? (
+             <>
+               <div className="text-[13px] mb-2" style={{ color: c.dark }}>
+-                I, <strong>{author?.name ?? "?"}</strong>, commit to...
++                I, <strong>{author?.name ?? "?"}</strong>, want to help drive...
+               </div>
+               <textarea
+                 value={draftWhat}
+@@ -498,7 +488,7 @@ function CommitmentCard({
+             <>
+               <div className="flex items-start justify-between gap-2">
+                 <div className="text-[13px]" style={{ color: c.dark }}>
+-                  <strong>{author?.name ?? "Unknown"}</strong> commits to:
++                  <strong>{author?.name ?? "Unknown"}</strong> wants to help drive:
+                 </div>
+                 {isOwn ? (
+                   <button
+diff --git a/app/r/[code]/health/page.tsx b/app/r/[code]/health/page.tsx
+index a4be911..9c14328 100644
+--- a/app/r/[code]/health/page.tsx
++++ b/app/r/[code]/health/page.tsx
+@@ -35,7 +35,6 @@ type RetroLane = "cx" | "vmo";
+ 
+ const LANES: ReadonlyArray<{ key: RetroLane; label: string; colorIdx: 0 | 1 | 2 | 3 | 4 }> = [
+   { key: "cx",  label: "CX transformation", colorIdx: 4 },
+-  { key: "vmo", label: "VMO",               colorIdx: 2 },
+ ];
+ 
+ const ACTIONS: ReadonlyArray<{
+@@ -516,8 +515,8 @@ export default function HealthPage() {
+           Continue / Stop / Change
+         </h2>
+         <p className="text-xs text-ink-faint mb-5">
+-          Capture what&apos;s working, what to drop, and what to do differently —
+-          for each lane.
++          Capture what&apos;s working, what to drop, and what to do differently
++          for the CX Transformation.
+         </p>
+ 
+         <Card>
+diff --git a/app/r/[code]/page.tsx b/app/r/[code]/page.tsx
+index 13bd721..fbbf439 100644
+--- a/app/r/[code]/page.tsx
++++ b/app/r/[code]/page.tsx
+@@ -2,7 +2,6 @@
+ 
+ import Link from "next/link";
+ import { useState } from "react";
+-import { BirthdayPresent } from "@/app/components/BirthdayPresent";
+ import { Card } from "@/app/components/Card";
+ import { Eyebrow } from "@/app/components/Eyebrow";
+ import { PauseCard } from "@/app/components/PauseCard";
+@@ -13,16 +12,6 @@ import { COLORS, colorForIdx } from "@/lib/colors";
+ import { pageHref } from "@/lib/pages";
+ import { joinExistingRoom } from "@/lib/rooms";
+ 
+-const MORNING = [
+-  { title: "Let's celebrate our success",      mins: "30 min" },
+-  { title: "Program health check & retro",     mins: "45 min" },
+-  { title: "Commitments going forward",        mins: "30 min" },
+-];
+-const AFTERNOON = [
+-  { title: "Looking ahead: the rest of the year", mins: "40 min" },
+-  { title: "Closing reflections",                 mins: "20 min" },
+-];
+-
+ export default function WelcomePage() {
+   const { status, session, participants, currentParticipant } = useSession();
+ 
+@@ -130,47 +119,6 @@ export default function WelcomePage() {
+           )}
+         </Card>
+ 
+-        <div className="max-w-[900px]">
+-          <Eyebrow color={COLORS[2].hex}>AGENDA</Eyebrow>
+-          <h2 className="text-2xl font-medium text-navy mb-5">How we&apos;ll spend the day</h2>
+-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+-            <Card>
+-              <Eyebrow color={COLORS[0].hex}>MORNING</Eyebrow>
+-              {MORNING.map((item) => (
+-                <div
+-                  key={item.title}
+-                  className="flex justify-between items-baseline mt-3"
+-                >
+-                  <div
+-                    className="text-[13px] font-medium"
+-                    style={{ color: COLORS[1].hex }}
+-                  >
+-                    {item.title}
+-                  </div>
+-                  <div className="text-[11px] text-ink-ghost">{item.mins}</div>
+-                </div>
+-              ))}
+-            </Card>
+-            <Card>
+-              <Eyebrow color={COLORS[2].hex}>AFTERNOON</Eyebrow>
+-              {AFTERNOON.map((item) => (
+-                <div
+-                  key={item.title}
+-                  className="flex justify-between items-baseline mt-3"
+-                >
+-                  <div
+-                    className="text-[13px] font-medium"
+-                    style={{ color: COLORS[1].hex }}
+-                  >
+-                    {item.title}
+-                  </div>
+-                  <div className="text-[11px] text-ink-ghost">{item.mins}</div>
+-                </div>
+-              ))}
+-            </Card>
+-          </div>
+-        </div>
+-
+         {currentParticipant ? (
+           <div className="mt-10">
+             <Link href={pageHref(session.code, "celebrate")} prefetch>
+@@ -180,15 +128,14 @@ export default function WelcomePage() {
+         ) : null}
+ 
+         <PauseCard
+-          emoji="🎂"
++          emoji="👋"
+           title="Quick warm-up before we dig in"
+-          body="Go round the room: what was your best birthday, and why?"
+-          footer="Take 5 minutes."
++          body="Go round the room: in one word, how are you arriving today?"
++          footer="Take 2 minutes."
+           bgColor={COLORS[3].tint}
+           textColor={COLORS[3].dark}
+         />
+       </div>
+-      <BirthdayPresent />
+     </main>
+   );
+ }

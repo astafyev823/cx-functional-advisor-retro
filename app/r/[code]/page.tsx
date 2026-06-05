@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BirthdayPresent } from "@/app/components/BirthdayPresent";
 import { Card } from "@/app/components/Card";
 import { Eyebrow } from "@/app/components/Eyebrow";
 import { PauseCard } from "@/app/components/PauseCard";
@@ -12,16 +11,6 @@ import { useSession } from "@/app/components/SessionProvider";
 import { COLORS, colorForIdx } from "@/lib/colors";
 import { pageHref } from "@/lib/pages";
 import { joinExistingRoom } from "@/lib/rooms";
-
-const MORNING = [
-  { title: "Let's celebrate our success",      mins: "30 min" },
-  { title: "Program health check & retro",     mins: "45 min" },
-  { title: "Commitments going forward",        mins: "30 min" },
-];
-const AFTERNOON = [
-  { title: "Looking ahead: the rest of the year", mins: "40 min" },
-  { title: "Closing reflections",                 mins: "20 min" },
-];
 
 export default function WelcomePage() {
   const { status, session, participants, currentParticipant } = useSession();
@@ -130,47 +119,6 @@ export default function WelcomePage() {
           )}
         </Card>
 
-        <div className="max-w-[900px]">
-          <Eyebrow color={COLORS[2].hex}>AGENDA</Eyebrow>
-          <h2 className="text-2xl font-medium text-navy mb-5">How we&apos;ll spend the day</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Card>
-              <Eyebrow color={COLORS[0].hex}>MORNING</Eyebrow>
-              {MORNING.map((item) => (
-                <div
-                  key={item.title}
-                  className="flex justify-between items-baseline mt-3"
-                >
-                  <div
-                    className="text-[13px] font-medium"
-                    style={{ color: COLORS[1].hex }}
-                  >
-                    {item.title}
-                  </div>
-                  <div className="text-[11px] text-ink-ghost">{item.mins}</div>
-                </div>
-              ))}
-            </Card>
-            <Card>
-              <Eyebrow color={COLORS[2].hex}>AFTERNOON</Eyebrow>
-              {AFTERNOON.map((item) => (
-                <div
-                  key={item.title}
-                  className="flex justify-between items-baseline mt-3"
-                >
-                  <div
-                    className="text-[13px] font-medium"
-                    style={{ color: COLORS[1].hex }}
-                  >
-                    {item.title}
-                  </div>
-                  <div className="text-[11px] text-ink-ghost">{item.mins}</div>
-                </div>
-              ))}
-            </Card>
-          </div>
-        </div>
-
         {currentParticipant ? (
           <div className="mt-10">
             <Link href={pageHref(session.code, "celebrate")} prefetch>
@@ -180,15 +128,14 @@ export default function WelcomePage() {
         ) : null}
 
         <PauseCard
-          emoji="🎂"
+          emoji="👋"
           title="Quick warm-up before we dig in"
-          body="Go round the room: what was your best birthday, and why?"
-          footer="Take 5 minutes."
+          body="Go round the room: in one word, how are you arriving today?"
+          footer="Take 2 minutes."
           bgColor={COLORS[3].tint}
           textColor={COLORS[3].dark}
         />
       </div>
-      <BirthdayPresent />
     </main>
   );
 }
